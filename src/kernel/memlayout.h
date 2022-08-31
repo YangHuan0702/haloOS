@@ -11,9 +11,7 @@
 #define ReadReg(reg) (*(Reg(reg)))
 #define WriteReg(reg,v) (*(Reg(reg)) = v)
 
-
-void uart_putstr(char* s);
-void uart_putc(char c);
-
 // --------------------------------- Common ------------------------------
 #define LM5 (1<<5)
+
+#define STACK_SIZE 1024

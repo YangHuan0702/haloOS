@@ -1,8 +1,15 @@
-#include "print.h"
 #include "memlayout.h"
+#include "defs.h"
 
 void printf(char *s, ...){
+    if(s == 0){
+        return;
+    }
+    
+}
 
+void print(char *s){
+    uart_putstr(s);
 }
 
 void println(char *s){

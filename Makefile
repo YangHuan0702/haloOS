@@ -8,20 +8,24 @@ OBJDUMP = riscv64-unknown-elf-objdump
 
 kernel = src/kernel/memlayout.c \
 		 src/kernel/memlayout.h \
-		 src/kernel/print.h \
+		 src/kernel/defs.h \
 		 src/kernel/print.c \
+		 src/kernel/proc.h \
+		 src/kernel/proc.h \
+		 src/kernel/riscv.h \
+		 src/kernel/type.h \
 
 
 all: os.elf
 
 
 
-os.elf: src/start.s src/main.c ${kernel}
+os.elf: src/start.S src/kernel/swtch.S src/main.c ${kernel}
 	$(CC) $(CFLAGS) -T src/os.ld -o os.elf $^
 
 
 qemu: $(TARGET)
-	@qemu-system-riscv32 -M ? | grep virt >/dev/null || exit
+	@qemu-system-riscv64 -M ? | grep virt >/dev/null || exit
 	@echo "Press Ctrl-A and then X to exit QEMU"
 	$(QEMU) $(QFLAGS) -kernel os.elf
 
