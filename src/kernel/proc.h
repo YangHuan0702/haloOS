@@ -1,7 +1,7 @@
 #include "type.h"
 #include "memlayout.h"
 
-char task0_stack[STACK_SIZE];
+void user_task0();
 
 struct context {
   uint64 ra;
