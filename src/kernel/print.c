@@ -1,13 +1,38 @@
 #include "memlayout.h"
 #include "defs.h"
 #include "type.h"
+#include <stdarg.h>
+
+
+static char nums[] = "0123456789abcdef";
+
+static void printInt(int val,int u){
+    char buf[16];
+    int i = 0;
+    do
+    {
+        buf[i++] = nums[val % 10];        
+    } while ((val /= 10) > 0);
+    for(;i >= 0; i--){
+        uart_putc(buf[i]);
+    }
+}
+
+
+static void printpp(uint64 ptr){
+    if(!ptr)
+        return;
+    
+}
+
 
 void printf(char *s, ...){
     if(s == 0){
         return;
     }
     va_list ap;
-    va_start(s,ap);
+    va_start(ap,s);
+    char *str;
     for(int i = 0; s[i] != 0; i++){
         char c = s[i];
         if(c != '%'){
@@ -21,17 +46,16 @@ void printf(char *s, ...){
         }
         switch (next) {
         case 'd':
-            int d = va_arg(ap,int);
-
+            printInt(va_arg(ap,int),1);
             break;
         case 's':
-            char *str = va_arg(ap,char*);
+            str = va_arg(ap,char*);
             if(str){
                 print(str);
             }
         break;
-        case 'p'
-            printPtr(va_arg(ap,uint64));
+        case 'p':
+            printpp(va_arg(ap,uint64));
         break;
         default:
             uart_putc(next);
@@ -39,6 +63,7 @@ void printf(char *s, ...){
         }
     }    
 }
+
 
 void print(char *s){
     uart_putstr(s);
@@ -49,9 +74,3 @@ void println(char *s){
     uart_putstr(s);
     uart_putstr(nextLine);
 }
-
-
-static void printPtr(uint64 ptr){
-
-}
-
