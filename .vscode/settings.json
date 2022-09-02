@@ -5,7 +5,8 @@
         "random": "c",
         "type.h": "c",
         "memlayout.h": "c",
-        "defs.h": "c"
+        "defs.h": "c",
+        "exception": "c"
     },
     "C_Cpp.errorSquiggles": "Disabled"
 }

@@ -1,6 +1,6 @@
+#include "type.h"
 #include "memlayout.h"
 #include "defs.h"
-#include "type.h"
 #include <stdarg.h>
 
 
@@ -19,11 +19,33 @@ static void printInt(int val,int u){
 }
 
 
-static void printpp(uint64 ptr){
+static void printPtr(uint64 ptr){
     if(!ptr)
         return;
+    uart_putc('0');
+    uart_putc('x');
     
+    for(int i = 0; i < (sizeof(uint64) * 2); i++,ptr <<= 4){
+        uart_putc(nums[ptr >> sizeof(uint64) * 8 - 4]);
+    }
 }
+
+
+void printP(uint64 ptr){
+    uart_putc('0');
+    uart_putc('x');
+    char buff[32];    
+    
+    int a,i;
+    do {
+        a = ptr % 16;
+        buff[i++] = nums[a];
+    } while ((ptr /= 16) > 0);
+    for(i-=1;i >= 0; i--){
+         uart_putc(buff[i]);
+    }
+}
+
 
 
 void printf(char *s, ...){
@@ -55,7 +77,7 @@ void printf(char *s, ...){
             }
         break;
         case 'p':
-            printpp(va_arg(ap,uint64));
+            printPtr(va_arg(ap,uint64));
         break;
         default:
             uart_putc(next);

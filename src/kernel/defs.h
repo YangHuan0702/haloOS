@@ -15,4 +15,5 @@ void uart_putc(char c);
 void printf(char *s, ...);
 void print(char *s);
 void println(char *s);
+void printP(uint64 ptr);
 
