@@ -4,11 +4,15 @@ struct context;
 void swtch(struct context *old, struct context *new);
 
 // proc.c
-void user_task0();
+int get_tasks();
+void user_init();
+void run_target_task_num(int num);
+void run_os_task();
 
 // memlayout.c
 void uart_putstr(char* s);
 void uart_putc(char c);
+
 
 
 // print.c

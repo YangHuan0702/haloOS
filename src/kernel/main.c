@@ -2,18 +2,26 @@
 #include "defs.h"
 
 
-char task0_stack[STACK_SIZE];
-int os_main(){
-    print("Halo OS\n");
+void start_task(){
     print("OS start\n");
-    int a = 1;
-    printf("a:%p\n",&a);
-    printP((uint64)&a);
-     print("\n");
-    struct context ctx_task;
-    struct context ctx_os;
-	ctx_task.ra = (uint64) user_task0;
-	ctx_task.sp = (uint64) &task0_stack[STACK_SIZE-1];
-	swtch(&ctx_os, &ctx_task);
+	user_init();
+}
+
+int os_main(){
+
+    start_task();
+
+
+    int current_task = 0;
+
+    while (1) {
+        print("OS: Activate next task\n");
+        run_target_task_num(current_task);
+        print("OS: Back to OS\n");
+        int tasks = get_tasks();
+		current_task = (current_task + 1) % tasks;
+		print("\n");
+    }
+    
     return 0;
 }

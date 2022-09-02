@@ -13,7 +13,7 @@ static void printInt(int val,int u){
     {
         buf[i++] = nums[val % 10];        
     } while ((val /= 10) > 0);
-    for(;i >= 0; i--){
+    for(i-=1;i >= 0; i--){
         uart_putc(buf[i]);
     }
 }

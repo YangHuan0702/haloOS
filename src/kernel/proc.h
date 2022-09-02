@@ -1,7 +1,8 @@
 #include "type.h"
 #include "memlayout.h"
 
-void user_task0();
+#define MAX_TASK 1024
+
 
 struct context {
   uint64 ra;
