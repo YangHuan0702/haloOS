@@ -34,7 +34,7 @@ void start(){
     write_mideleg(0xffff);  // 中断委派处理
 
     write_pmpaddr0(0x3fffffffffffffull);
-    write_pmpcfg0(0xf);
+    write_pmpcfg0(0xf); // 读，写，执行，启用此PMP
 
     // 开启中断
     write_mie(read_mie() | SIE_SEIE | SIE_STIE | SIE_SSIE);
