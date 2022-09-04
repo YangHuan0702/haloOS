@@ -9,7 +9,13 @@ void timer_init();
 
 static int timer_processed_count = 0;
 void timer_handler(){
-    printf("Time Processed Count : %d\n",timer_processed_count++);
+    // timer_processed_count++;
+    // int current_tasks = get_tasks();
+    // if(0 == current_tasks){
+    //     return;
+    // }
+    // int task_num = timer_processed_count % current_tasks;
+    // run_target_task_num(task_num);
 }
 
 void start(){
@@ -27,12 +33,17 @@ void start(){
     write_medeleg(0xffff);  // 异常委派处理
     write_mideleg(0xffff);  // 中断委派处理
 
+    write_pmpaddr0(0x3fffffffffffffull);
+    write_pmpcfg0(0xf);
+
     // 开启中断
     write_mie(read_mie() | SIE_SEIE | SIE_STIE | SIE_SSIE);
 
     timer_init();
-   
-   asm volatile("mret");
+
+    write_tp(read_mhartid());
+
+    asm volatile("mret");
 }
 
 void timer_init(){

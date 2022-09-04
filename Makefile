@@ -19,11 +19,12 @@ CFLAGS += -mno-relax -I.
 OBJS = \
 		 src/kernel/entry.o \
 		 src/kernel/start.o \
+		 src/kernel/main.o \
 		 src/kernel/print.o \
 		 src/kernel/proc.o \
 		 src/kernel/swtch.o \
 		 src/kernel/memlayout.o \
-		 src/kernel/main.o \
+
 
 src/kernel/%.o: src/kernel/%.c
 	$(CC) $(CFLAGS) -c -o $@ $<
