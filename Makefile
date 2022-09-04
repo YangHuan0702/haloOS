@@ -17,6 +17,7 @@ CFLAGS += -mno-relax -I.
 #		 src/kernel/type.h \
 
 OBJS = \
+		 src/kernel/entry.o \
 		 src/kernel/start.o \
 		 src/kernel/print.o \
 		 src/kernel/proc.o \
