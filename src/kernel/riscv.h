@@ -23,6 +23,10 @@ static inline uint64 write_sie(uint64 x){
 }
 
 
+static inline void write_mscratch(uint64 x){
+    asm volatile("csrw mscratch,%0"::"r"(x));
+}
+
 static inline void write_medeleg(uint64 x){
     asm volatile("csrw medeleg,%0"::"r"(x));
 }

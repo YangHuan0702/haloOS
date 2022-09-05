@@ -7,6 +7,8 @@ int main();
 
 void timer_init();
 
+uint64 timer_scratch[NCPU][5];
+
 static int timer_processed_count = 0;
 void timer_handler(){
     timer_processed_count++;
@@ -56,6 +58,12 @@ void timer_init(){
     write_mtvec((uint64)timer_handler);
 
     write_mstatus(read_mstatus() | MSTATUS_MIE);
+
+
+    uint64 *scratch = &timer_scratch[hartid][0];
+    scratch[3] = CLINT_MTIMECMP(hartid);
+    scratch[4] = INTERVAL;
+    write_mscratch((uint64)scratch);
 
     write_mie(read_mie() | MIE_MTIE);
 }
