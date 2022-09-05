@@ -9,13 +9,14 @@ void timer_init();
 
 static int timer_processed_count = 0;
 void timer_handler(){
-    // timer_processed_count++;
-    // int current_tasks = get_tasks();
-    // if(0 == current_tasks){
-    //     return;
-    // }
-    // int task_num = timer_processed_count % current_tasks;
-    // run_target_task_num(task_num);
+    timer_processed_count++;
+    int current_tasks = get_tasks();
+    if(0 == current_tasks){
+        return;
+    }
+    int task_num = timer_processed_count % current_tasks;
+    printf("timer switch num:%d\n",task_num);
+    run_target_task_num(task_num);
 }
 
 void start(){
@@ -33,7 +34,8 @@ void start(){
     write_medeleg(0xffff);  // 异常委派处理
     write_mideleg(0xffff);  // 中断委派处理
 
-    write_pmpaddr0(0x3fffffffffffffull);
+    // 硬件内存保护寄存器，在硬件层面开放内存地址的访问权限
+    write_pmpaddr0(0x3fffffffffffffull);   // 2^38 - 1
     write_pmpcfg0(0xf); // 读，写，执行，启用此PMP
 
     // 开启中断
