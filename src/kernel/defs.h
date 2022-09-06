@@ -13,7 +13,8 @@ void run_os_task();
 void uart_putstr(char* s);
 void uart_putc(char c);
 
-
+// trap.c
+void trapinit();
 
 // print.c
 void printf(char *s, ...);

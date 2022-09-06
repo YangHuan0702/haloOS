@@ -3,7 +3,7 @@ CC = riscv64-unknown-elf-gcc
 CFLAGS = -nostdlib -fno-builtin -mcmodel=medany -march=rv64g -fno-common -ffreestanding
 
 QEMU = qemu-system-riscv64
-QFLAGS = -nographic -smp 4 -machine virt -bios none
+QFLAGS = -nographic -smp 4 -m 128M -machine virt -bios none
 
 CFLAGS += -mno-relax -I.
 
@@ -19,11 +19,13 @@ CFLAGS += -mno-relax -I.
 OBJS = \
 		 src/kernel/entry.o \
 		 src/kernel/start.o \
+		 src/kernel/kernelvec.o \
 		 src/kernel/main.o \
 		 src/kernel/print.o \
 		 src/kernel/proc.o \
 		 src/kernel/swtch.o \
 		 src/kernel/memlayout.o \
+		 src/kernel/trap.o \
 
 
 src/kernel/%.o: src/kernel/%.c

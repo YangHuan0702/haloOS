@@ -17,11 +17,29 @@
 static inline uint64 read_sie(){
     uint64 x;
     asm volatile("csrr %0,sie":"=r"(x));
-}
-static inline uint64 write_sie(uint64 x){
-    asm volatile("csrw,sie,%0"::"r"(x));
+    return x;
 }
 
+static inline void write_sie(uint64 x){
+    asm volatile("csrw sie,%0"::"r"(x));
+}
+
+static inline uint64 read_sip(){
+    uint64 x;
+    asm volatile("csrr %0,sip" : "=r"(x));
+    return x;
+}
+
+
+static inline uint64 read_stvec(){
+    uint64 x;
+    asm volatile("csrr %0,stvec":"=r"(x));
+    return x;
+}
+
+static inline void write_stvec(uint64 x){
+    asm volatile("csrw stvec, %0" : : "r" (x));
+}
 
 static inline void write_mscratch(uint64 x){
     asm volatile("csrw mscratch,%0"::"r"(x));
