@@ -4,12 +4,12 @@
 
 
 void usertrap(){
-
+    println("...\n");
 }
 
 
 void kerneltrap(){
-    println("kernel trap ...");
+    println("kernel trap...");
 }
 
 void trapinit(){

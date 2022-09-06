@@ -3,11 +3,16 @@
 #include "riscv.h"
 
 int main(){
+    intr_on();
     print("OS: Start\n");
     trapinit();
     user_init();
-    asm volatile("csrw sip,2");
     while(1){
+        if((read_sstatus() & SSTATUS_SIE) == 0){
+            println("null");
+        }else{
+            println("true");
+        }
     }    
     return 0;
 }
