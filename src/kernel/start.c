@@ -11,17 +11,17 @@ uint64 timer_scratch[NCPU][5];
 
 extern void timervec();
 
-static int timer_processed_count = 0;
-void timer_handler(){
-    timer_processed_count++;
-    int current_tasks = get_tasks();
-    if(0 == current_tasks){
-        return;
-    }
-    int task_num = timer_processed_count % current_tasks;
-    printf("timer switch num:%d\n",task_num);
-    run_target_task_num(task_num);
-}
+// static int timer_processed_count = 0;
+// void timer_handler(){
+//     timer_processed_count++;
+//     int current_tasks = get_tasks();
+//     if(0 == current_tasks){
+//         return;
+//     }
+//     int task_num = timer_processed_count % current_tasks;
+//     printf("timer switch num:%d\n",task_num);
+//     run_target_task_num(task_num);
+// }
 
 void start(){
     // 将先前的M模式设置为S，用于mret
