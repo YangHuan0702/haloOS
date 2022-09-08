@@ -3,7 +3,7 @@ CC = riscv64-unknown-elf-gcc
 CFLAGS = -nostdlib -fno-builtin -mcmodel=medany -march=rv64g -fno-common -ffreestanding
 
 QEMU = qemu-system-riscv64
-QFLAGS = -nographic -smp 4 -m 128M -machine virt -bios none -D ./kernelLog -d out_asm,in_asm,exec,cpu
+QFLAGS = -nographic -smp 4 -m 128M -machine virt -bios none
 # -D ./kernelLog -d out_asm,in_asm,exec,cpu
 # virtio-blk-device,drive=x0,bus=virtio-mmio-bus.0
 CFLAGS += -mno-relax -I.
@@ -29,6 +29,8 @@ OBJS = \
 		 src/kernel/trap.o \
 		 src/kernel/spinlock.o \
 		 src/kernel/atomic.o \
+
+.PRECIOUS: %.o
 
 .PRECIOUS: %.o
 
