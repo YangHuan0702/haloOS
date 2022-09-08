@@ -6,7 +6,8 @@
         "type.h": "c",
         "memlayout.h": "c",
         "defs.h": "c",
-        "exception": "c"
+        "exception": "c",
+        "riscv.h": "c"
     },
     "C_Cpp.errorSquiggles": "Disabled"
 }

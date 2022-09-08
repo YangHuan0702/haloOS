@@ -1,7 +1,12 @@
 struct context;
+struct spinlock;
 
 // swtch.S
 void swtch(struct context *old, struct context *new);
+
+// spinlock.c
+void lock(struct spinlock *lock);
+void unlock(struct spinlock *lock);
 
 // proc.c
 int get_tasks();

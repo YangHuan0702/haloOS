@@ -27,6 +27,8 @@ OBJS = \
 		 src/kernel/swtch.o \
 		 src/kernel/memlayout.o \
 		 src/kernel/trap.o \
+		 src/kernel/spinlock.o \
+		 src/kernel/atomic.o \
 
 .PRECIOUS: %.o
 
