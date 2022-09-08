@@ -4,7 +4,7 @@
 #include "spinlock.h"
 
 int main(){
-    // intr_on();
+    // intr_on(); 方便测试，关闭中断
     print("OS: Start\n");
     trapinit();
     user_init();
