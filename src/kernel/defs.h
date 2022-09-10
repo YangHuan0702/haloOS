@@ -17,6 +17,12 @@ void run_os_task();
 // memlayout.c
 void uart_putstr(char* s);
 void uart_putc(char c);
+void uartinit();
+int plic_claim();
+int uartgetc();
+void uartinterrupt();
+void plicinit();
+void plicinithart();
 
 // trap.c
 void trapinit();
@@ -26,4 +32,5 @@ void printf(char *s, ...);
 void print(char *s);
 void println(char *s);
 void printP(uint64 ptr);
+void printinit();
 
