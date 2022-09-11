@@ -6,7 +6,7 @@
 void usertrap(){
 }
 
-static int timer_processed_count = 0;
+static volatile int timer_processed_count = 0;
 
 void kerneltrap(){
     // 判断是否是软件中断
@@ -20,17 +20,16 @@ void kerneltrap(){
         println("kerneltrap: Handle kernel interrupts SIE cannot be set");
         return;
     }
-    printf("scause : %p----%d\n",scause,scause);
     if((scause & 0x8000000000000000) && (scause & 0xff) == 9){
-        // S Model External interrupt
         int irq = plic_claim();
         if(irq == UART0_IRQ){
-            println("UART0_IRQ JOIN");
             uartinterrupt();
         }else{
             printf("unknow irq processed:%d\n",irq);
         }
-
+        if(irq){
+            complate_irq(irq);
+        }
     }else if(scause == 0x8000000000000001){
         // 时间中断
         // timer_processed_count++;

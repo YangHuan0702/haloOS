@@ -23,6 +23,9 @@ int uartgetc();
 void uartinterrupt();
 void plicinit();
 void plicinithart();
+void complate_irq(int irq);
+
+
 
 // trap.c
 void trapinit();

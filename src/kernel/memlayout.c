@@ -1,7 +1,7 @@
 #include "type.h"
 #include "memlayout.h"
 #include "riscv.h"
-
+#include "defs.h"
 
 void uart_putc(char c){
     while ((ReadReg(LSR) & LM5) == 0){}
@@ -56,8 +56,10 @@ int plic_claim(){
 void uartinterrupt(){
     while(1){
         int c = uartgetc();
-        if(c == -1)
+        if(c == -1){
             break;
+        }
+        printf("c:%d\n",c);
         uart_putc(c);
     }
 }
@@ -78,4 +80,12 @@ void plicinithart()
 
   // set this hart's S-mode priority threshold to 0.
   *(uint32*)PLIC_SPRIORITY(hart) = 0;
+}
+
+
+void
+complate_irq(int irq)
+{
+  uint64 hart = r_tp();
+  *(uint32*)PLIC_SCLAIM(hart) = irq;
 }
