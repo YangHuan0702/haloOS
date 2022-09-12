@@ -10,8 +10,6 @@ static char nums[] = "0123456789abcdef";
 
 void printinit(){
     uartinit();
-    plicinit();
-    plicinithart();
 }
 
 static void printInt(int val,int u){

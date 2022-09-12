@@ -31,6 +31,7 @@
 
 #define Reg(reg)    (volatile unsigned char *)(UART + reg)
 #define LSR 5
+#define LSR_TX_IDLE (1<<5)
 #define RHR 0                 // 接收保持寄存器（用于输入字节）
 #define THR 0                 // 发送保持寄存器（用于输出字节）
 #define IER 1                 // 中断使能寄存器

@@ -1,6 +1,12 @@
 #include "type.h"
 #include "memlayout.h"
 
+static inline uint64 r_stval(){
+    uint64 x;
+    asm volatile("csrr %0,stval":"=r"(x));
+    return x;
+}
+
 static inline uint64
 r_sstatus()
 {

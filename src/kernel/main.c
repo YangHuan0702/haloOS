@@ -5,10 +5,13 @@
 
 int main(){
     intr_on(); //方便测试，关闭中断
-    print("OS: Start\n");
     printinit();
-    user_init();
     trapinit();
+    plicinit();
+    plicinithart();
+    print("OS: Start\n");
+    user_init();
+
     while(1){
     }    
     return 0;

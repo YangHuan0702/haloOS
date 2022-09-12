@@ -41,6 +41,8 @@ void kerneltrap(){
         // printf("timer switch num:%d\n",task_num);
         // run_target_task_num(task_num);
     }else{
+        printf("scause %p\n", scause);
+        printf("sepc=%p stval=%p\n", r_sepc(), r_stval());
         printf("unknow trap processor,scause:%p\n",scause);
     }
     
