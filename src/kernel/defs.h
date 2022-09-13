@@ -18,13 +18,16 @@ void run_os_task();
 void uart_putstr(char* s);
 void uart_putc(char c);
 void uartinit();
-int plic_claim();
 int uartgetc();
 void uartinterrupt();
+char* getCmd();
+int getShellResult();
+
+// plic.c
+int plic_claim();
 void plicinit();
 void plicinithart();
 void complate_irq(int irq);
-
 
 
 // trap.c

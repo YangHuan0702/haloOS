@@ -12,8 +12,18 @@ int main(){
     print("OS: Start\n");
     user_init();
     intr_on();
+
+    struct spinlock slock;
+    lock(&slock);
+    lock(&slock);
     while(1){
-        // println("---main---");
+        // printf("#: ");
+        // while (getShellResult() == 0) {
+        //     char *cmd = getCmd();
+        //     if(cmd){
+        //         printf("Handler: %s\n",cmd);
+        //     }
+        // }
         // intr_on();
     }    
     return 0;

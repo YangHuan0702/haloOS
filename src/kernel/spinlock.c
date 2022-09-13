@@ -3,11 +3,10 @@
 #include "memlayout.h"
 #include "spinlock.h"
 
-extern int atmswap(struct spinlock *lock);
-
+extern int atmswap(int *lock);
 
 void lock(struct spinlock *lock){
-    while (atmswap(lock) != 0){}
+    while (atmswap(&lock->locked) != 0){}
     printf("lock:%d\n",lock->locked);
 }
 

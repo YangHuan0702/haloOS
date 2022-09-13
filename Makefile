@@ -29,6 +29,7 @@ OBJS = \
 		 src/kernel/trap.o \
 		 src/kernel/spinlock.o \
 		 src/kernel/atomic.o \
+		 src/kernel/plic.o \
 
 .PRECIOUS: %.o
 

@@ -1,3 +1,4 @@
 struct spinlock{
-    volatile uint locked;
+    uint locked;
+    char* name;
 };
