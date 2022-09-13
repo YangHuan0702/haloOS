@@ -39,6 +39,10 @@ static inline uint64 r_spie(){
     return x;
 }
 
+static inline void w_sepc(uint64 x){
+    asm volatile("csrw sepc,%0"::"r"(x));
+}
+
 static inline uint64 r_sepc(){
     uint64 x;
     asm volatile("csrr %0,sepc":"=r"(x));
@@ -67,6 +71,9 @@ static inline uint64 r_sip(){
     return x;
 }
 
+static inline void w_sip(uint64 x){
+    asm volatile("csrw sip,%0"::"r"(x));
+}
 
 static inline uint64 r_stvec(){
     uint64 x;

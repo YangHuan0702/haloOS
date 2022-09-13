@@ -3,6 +3,9 @@
 #include "riscv.h"
 #include "memlayout.h"
 
+
+extern void kernelvec();
+
 void usertrap(){
 }
 
@@ -12,6 +15,7 @@ void kerneltrap(){
     // 判断是否是软件中断
     uint64 sstatus = r_sstatus();
     uint64 scause = r_scause();
+    uint64 sepc = r_sepc();
     if((sstatus & SSTATUS_SPP) == 0){
         println("kerneltrap: interrupt from U Model");
         return;
@@ -24,6 +28,8 @@ void kerneltrap(){
         int irq = plic_claim();
         if(irq == UART0_IRQ){
             uartinterrupt();
+        }else if(irq == VIRTIO0_IRQ){
+            // VIRTIO interrupter code
         }else{
             printf("unknow irq processed:%d\n",irq);
         }
@@ -40,16 +46,15 @@ void kerneltrap(){
         // int task_num = timer_processed_count % current_tasks;
         // printf("timer switch num:%d\n",task_num);
         // run_target_task_num(task_num);
+        w_sip(r_sip() & ~2);
     }else{
-        printf("scause %p\n", scause);
         printf("sepc=%p stval=%p\n", r_sepc(), r_stval());
-        printf("unknow trap processor,scause:%p\n",scause);
     }
     
-    // 进入中断后，SIE会被设置为0 屏蔽中断。且SIE之前的值保存在SPIE中
-    intr_on();
+    w_sepc(sepc);
+    w_sstatus(sstatus);
 }
 
 void trapinit(){
-    w_stvec((uint64)kerneltrap);
+    w_stvec((uint64)kernelvec);
 }

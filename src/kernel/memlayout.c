@@ -3,6 +3,9 @@
 #include "riscv.h"
 #include "defs.h"
 
+#define EOF 0
+#define CMD_BUFF 128
+
 void uart_putc(char c){
     while ((ReadReg(LSR) & LM5) == 0){}
     WriteReg(THR,c);
@@ -36,8 +39,7 @@ void uartinit(){
 //   initlock(&uart_tx_lock, "uart");
 }
 
-int uartgetc()
-{
+int uartgetc() {
   if(ReadReg(LSR) & 0x01){
     // input data is ready.
     return ReadReg(RHR);
@@ -54,13 +56,13 @@ int plic_claim(){
 
 
 void uartinterrupt(){
-    while(1){
-        int c = uartgetc();
-        if(c == -1){
-            break;
-        }
-        printf("c:%d\n",c);
-        uart_putc(c);
+    for(;;){
+      int c = uartgetc();
+      if(c == -1){
+          break;
+      }
+      uart_putc(c);
+      printf("c:%d\n",c);
     }
 }
 
