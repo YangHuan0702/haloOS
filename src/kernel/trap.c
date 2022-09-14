@@ -30,6 +30,7 @@ void kerneltrap(){
             uartinterrupt();
         }else if(irq == VIRTIO0_IRQ){
             // VIRTIO interrupter code
+            virtio_disk_isr();
         }else{
             printf("unknow irq processed:%d\n",irq);
         }
@@ -39,14 +40,14 @@ void kerneltrap(){
     }else if(scause == 0x8000000000000001){
         w_sip(r_sip() & ~2);
 
-        timer_processed_count++;
-        int current_tasks = get_tasks();
-        if(0 == current_tasks){
-            return;
-        }
-        int task_num = timer_processed_count % current_tasks;
-        printf("timer switch num:%d\n",task_num);
-        run_target_task_num(task_num);
+        // timer_processed_count++;
+        // int current_tasks = get_tasks();
+        // if(0 == current_tasks){
+        //     return;
+        // }
+        // int task_num = timer_processed_count % current_tasks;
+        // printf("timer switch num:%d\n",task_num);
+        // run_target_task_num(task_num);
     }else{
         printf("sepc=%p stval=%p\n", r_sepc(), r_stval());
     }

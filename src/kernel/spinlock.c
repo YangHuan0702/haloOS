@@ -13,7 +13,6 @@ void initlock(struct spinlock *lock,char *name){
 
 void lock(struct spinlock *lock){
     while (atmswap(&lock->locked) != 0){}
-    printf("lock:%d\n",lock->locked);
 }
 
 void unlock(struct spinlock *lock){
