@@ -7,7 +7,8 @@
         "memlayout.h": "c",
         "defs.h": "c",
         "exception": "c",
-        "riscv.h": "c"
+        "riscv.h": "c",
+        "virt.h": "c"
     },
     "C_Cpp.errorSquiggles": "Disabled"
 }

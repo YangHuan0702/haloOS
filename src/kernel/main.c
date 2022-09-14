@@ -11,11 +11,8 @@ int main(){
     plicinithart();
     print("OS: Start\n");
     user_init();
+    virtio_disk_init();
     intr_on();
-
-    struct spinlock slock;
-    lock(&slock);
-    lock(&slock);
     while(1){
         // printf("#: ");
         // while (getShellResult() == 0) {

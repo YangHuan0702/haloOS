@@ -1,5 +1,6 @@
 struct context;
 struct spinlock;
+struct blk;
 
 // swtch.S
 void swtch(struct context *old, struct context *new);
@@ -7,6 +8,7 @@ void swtch(struct context *old, struct context *new);
 // spinlock.c
 void lock(struct spinlock *lock);
 void unlock(struct spinlock *lock);
+void initlock(struct spinlock *lock,char *name);
 
 // proc.c
 int get_tasks();
@@ -40,3 +42,12 @@ void println(char *s);
 void printP(uint64 ptr);
 void printinit();
 
+// virt.c
+void virtio_disk_init();
+void virt_disk_rw(struct blk*,int);
+void virtio_disk_isr();
+void virtio_tester(int);
+
+
+// uitl.c
+char* memset(void*,int,int);

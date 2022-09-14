@@ -30,6 +30,8 @@ OBJS = \
 		 src/kernel/spinlock.o \
 		 src/kernel/atomic.o \
 		 src/kernel/plic.o \
+		 src/kernel/virt.o \
+		 src/kernel/util.o \
 
 .PRECIOUS: %.o
 
@@ -51,9 +53,7 @@ kernel: $(OBJS) src/kernel/os.ld
 
 
 QEMUOPTS = -machine virt -bios none -kernel src/kernel/kernel -m 128M -smp 1 -nographic
-#QEMUOPTS += -drive file=fs.img,if=none,format=raw,id=x0
-#QEMUOPTS += -drive if=none,format=raw,id=x0
-#QEMUOPTS += -device virtio-blk-device,drive=x0,bus=virtio-mmio-bus.0
+#QEMUOPTS += -drive file=fs.img,if=none,format=raw,id=x0 -device virtio-blk-device,drive=x0,bus=virtio-mmio-bus.0
 #os.elf: src/start.S src/kernel/swtch.S src/main.c $(OBJS)
 #	$(CC) $(CFLAGS) -T src/os.ld -o os.elf $^
 
