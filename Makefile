@@ -8,15 +8,6 @@ QFLAGS = -nographic -smp 4 -m 128M -machine virt -bios none
 # virtio-blk-device,drive=x0,bus=virtio-mmio-bus.0
 CFLAGS += -mno-relax -I.
 
-# kernel = src/kernel/memlayout.c \
-#		 src/kernel/memlayout.h \
-#		 src/kernel/defs.h \
-#		 src/kernel/print.c \
-#		 src/kernel/proc.h \
-#		 src/kernel/proc.h \
-#		 src/kernel/riscv.h \
-#		 src/kernel/type.h \
-
 OBJS = \
 		 src/kernel/entry.o \
 		 src/kernel/start.o \
@@ -32,11 +23,9 @@ OBJS = \
 		 src/kernel/plic.o \
 		 src/kernel/virt.o \
 		 src/kernel/util.o \
+		 src/kernel/sleeplock.o \
 
 .PRECIOUS: %.o
-
-.PRECIOUS: %.o
-
 
 src/kernel/%.o: src/kernel/%.c
 	$(CC) $(CFLAGS) -c -o $@ $<
@@ -55,14 +44,17 @@ hdd.dsk:
 	dd if=/dev/urandom of=hdd.dsk bs=1M count=32
 
 QEMUOPTS = -machine virt -bios none -kernel src/kernel/kernel -m 128M -smp 1 -nographic
-QFLAGS += -drive if=none,format=raw,file=hdd.dsk,id=x0
-QFLAGS += -device virtio-blk-device,drive=x0,bus=virtio-mmio-bus.0
-#QEMUOPTS += -drive file=fs.img,if=none,format=raw,id=x0 -device virtio-blk-device,drive=x0,bus=virtio-mmio-bus.0
+
+QEMUOPTS += -drive file=fs.img,if=none,format=raw,id=x0 -device virtio-blk-device,drive=x0,bus=virtio-mmio-bus.0
 #os.elf: src/start.S src/kernel/swtch.S src/main.c $(OBJS)
 #	$(CC) $(CFLAGS) -T src/os.ld -o os.elf $^
 
 gdb: src/kernel/kernel
 	$(QEMU) $(QEMUOPTS) -S -gdb tcp::25000
+
+# fs
+#QFLAGS += -drive if=none,format=raw,file=hdd.dsk,id=x0
+#QFLAGS += -device virtio-blk-device,drive=x0,bus=virtio-mmio-bus.0
 
 qemu: $(TARGET) hdd.dsk
 	@qemu-system-riscv64 -M ? | grep virt >/dev/null || exit

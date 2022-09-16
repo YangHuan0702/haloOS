@@ -28,7 +28,7 @@ static struct disk{
     char free[NUM]; 
 
     struct{
-        struct blk *b;
+        struct buf *b;
         char status;
     } info[NUM];
 
@@ -119,9 +119,9 @@ static void free_chain(int i) {
   }
 }
 
-void virt_disk_rw(struct blk *b, int write) {
+void virt_disk_rw(struct buf *b, int write) {
     // 指定写入的扇区
-    uint64 sector = b->blockno * (BSIZE / 512);
+    uint64 sector = b->blockno * (BSIZE / 512); 
 
     lock(&disk.disklock);
     int idx[3];
@@ -138,15 +138,15 @@ void virt_disk_rw(struct blk *b, int write) {
     } else{
         buf0->type = VIRTIO_BLK_T_IN;
     }
-    buf0->reserved = 0;             // The reserved portion is used to pad the header to 16 bytes and move the 32-bit sector field to the correct place.
-    buf0->sector = sector;          // specify the sector that we wanna modified.
+    buf0->reserved = 0;             // 保留部分用于将标头填充到 16 个字节，并将32位扇区字段移动到正确的位置。
+    buf0->sector = sector;          // 指定我们要修改的扇区
 
     disk.desc[idx[0]].addr = (uint64) buf0;
     disk.desc[idx[0]].len = sizeof(struct virt_blk_req);
     disk.desc[idx[0]].flags = VRING_DESC_F_NEXT;
     disk.desc[idx[0]].next = idx[1];
 
-    disk.desc[idx[1]].addr = (uint64)b->data & 0xffffffff;
+    disk.desc[idx[1]].addr = (uint64)b->data;
     disk.desc[idx[1]].len = BSIZE;
     if (write){
         disk.desc[idx[1]].flags = 0; // 设备读取 b->data
@@ -156,7 +156,7 @@ void virt_disk_rw(struct blk *b, int write) {
     disk.desc[idx[1]].flags |= VRING_DESC_F_NEXT;
     disk.desc[idx[1]].next = idx[2];
 
-    disk.info[idx[0]].status = 0;
+    disk.info[idx[0]].status = 0xff;
     disk.desc[idx[2]].addr = (uint64)&disk.info[idx[0]].status;
     disk.desc[idx[2]].len = 1;
     disk.desc[idx[2]].flags = VRING_DESC_F_WRITE; // 设备写入状态
@@ -192,20 +192,24 @@ void virtio_disk_init() {
 
   initlock(&disk.disklock, "virtlock");
 
-  if(*R(VIRTIO_MMIO_MAGIC_VALUE) != 0x74726976 ||
-     *R(VIRTIO_MMIO_VERSION) != 1 ||
+  //校验磁盘是否存在
+  if(*R(VIRTIO_MMIO_MAGIC_VALUE) != 0x74726976 ||     // virtio-v1.1[4.2.2.2] The driver MUST ignore a device with MagicValue which is not 0x74726976
+     *R(VIRTIO_MMIO_VERSION) != 1 ||              
      *R(VIRTIO_MMIO_DEVICE_ID) != 2 ||
      *R(VIRTIO_MMIO_VENDOR_ID) != 0x554d4551) {
     println("could not find virtio disk");
     return;
   }
   
+  // os已经找到了该设备，并标识为一个有效的virtio设备
   status |= VIRTIO_CONFIG_S_ACKNOWLEDGE;
   *R(VIRTIO_MMIO_STATUS) = status;
 
+  // os知道如何驱动该设备
   status |= VIRTIO_CONFIG_S_DRIVER;
   *R(VIRTIO_MMIO_STATUS) = status;
 
+  // 读取设备特征位，并将操作系统和驱动程序所理解的特征位子集写到设备上
   uint64 features = *R(VIRTIO_MMIO_DEVICE_FEATURES);
   features &= ~(1 << VIRTIO_BLK_F_RO);
   features &= ~(1 << VIRTIO_BLK_F_SCSI);
@@ -224,8 +228,10 @@ void virtio_disk_init() {
   status |= VIRTIO_CONFIG_S_DRIVER_OK;
   *R(VIRTIO_MMIO_STATUS) = status;
 
+  // os中的页大小
   *R(VIRTIO_MMIO_GUEST_PAGE_SIZE) = PGSIZE;
 
+  // 虚拟队列索引号
   *R(VIRTIO_MMIO_QUEUE_SEL) = 0;
   uint32 max = *R(VIRTIO_MMIO_QUEUE_NUM_MAX);
   if(max == 0){
@@ -236,6 +242,8 @@ void virtio_disk_init() {
     println("virtio disk max queue too short");
     return;
   }
+
+  // 虚拟队列当前容量值
   *R(VIRTIO_MMIO_QUEUE_NUM) = NUM;
   memset(disk.pages, 0, sizeof(disk.pages));
   *R(VIRTIO_MMIO_QUEUE_PFN) = ((uint64)disk.pages) >> PGSHIFT;

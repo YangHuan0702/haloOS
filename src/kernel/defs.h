@@ -1,6 +1,7 @@
 struct context;
 struct spinlock;
-struct blk;
+struct buf;
+struct superblock;
 
 // swtch.S
 void swtch(struct context *old, struct context *new);
@@ -44,7 +45,7 @@ void printinit();
 
 // virt.c
 void virtio_disk_init();
-void virt_disk_rw(struct blk*,int);
+// void virt_disk_rw(struct blk*,int);
 void virtio_disk_isr();
 void virtio_tester(int);
 
