@@ -8,7 +8,8 @@
         "defs.h": "c",
         "exception": "c",
         "riscv.h": "c",
-        "virt.h": "c"
+        "virt.h": "c",
+        "sleeplock.h": "c"
     },
     "C_Cpp.errorSquiggles": "Disabled"
 }

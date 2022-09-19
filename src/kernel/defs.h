@@ -4,22 +4,22 @@ struct buf;
 struct superblock;
 
 // swtch.S
-void swtch(struct context *old, struct context *new);
+void swtch(struct context*, struct context*);
 
 // spinlock.c
-void lock(struct spinlock *lock);
-void unlock(struct spinlock *lock);
-void initlock(struct spinlock *lock,char *name);
+void lock(struct spinlock*);
+void unlock(struct spinlock*);
+void initlock(struct spinlock*,char*);
 
 // proc.c
 int get_tasks();
 void user_init();
-void run_target_task_num(int num);
+void run_target_task_num(int);
 void run_os_task();
 
 // memlayout.c
-void uart_putstr(char* s);
-void uart_putc(char c);
+void uart_putstr(char*);
+void uart_putc(char);
 void uartinit();
 int uartgetc();
 void uartinterrupt();
@@ -30,24 +30,23 @@ int getShellResult();
 int plic_claim();
 void plicinit();
 void plicinithart();
-void complate_irq(int irq);
+void complate_irq(int);
 
 
 // trap.c
 void trapinit();
 
 // print.c
-void printf(char *s, ...);
-void print(char *s);
-void println(char *s);
-void printP(uint64 ptr);
+void printf(char*, ...);
+void print(char*);
+void println(char*);
+void printP(uint64);
 void printinit();
 
 // virt.c
 void virtio_disk_init();
-// void virt_disk_rw(struct blk*,int);
+void virt_disk_rw(struct buf*,int);
 void virtio_disk_isr();
-void virtio_tester(int);
 
 
 // uitl.c

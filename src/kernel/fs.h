@@ -18,6 +18,8 @@
 //      0             1       2   ~   31  32    ~   45     46     47
 
 #include "type.h"
+#include "spinlock.h"
+#include "sleeplock.h"
 
 #define BSIZE 1024
 

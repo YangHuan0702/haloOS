@@ -3,20 +3,11 @@
 #include "defs.h"
 #include "virt.h"
 #include "fs.h"
-#include "spinlock.h"
 
 
 #define R(addr) ((volatile uint32*)(VIRTIO_MMIO_BASE + (addr)))
 
-struct blk{
-    uint32 dev;
-    uint32 blockno;
-    struct spinlock blklock;
-    int disk;
-    unsigned char data[BSIZE];
-};
-
-static struct disk{
+static struct disk{6
     char pages[2 * PGSIZE];
 
     struct virt_desc *desc;
@@ -39,28 +30,6 @@ static struct disk{
     struct spinlock disklock;
 } __attribute__((aligned(PGSIZE))) disk;
 
-
-struct blk b[3];
-
-
-void virtio_tester(int write) {
-    if(!b[0].dev){
-        println("buffer init...");
-        
-        b[0].dev = 1;
-        b[0].blockno = 1;
-        for(int i = 0;i < BSIZE; i++){
-            b[0].data[i] = 0;
-        }
-
-        initlock(&(b[0].blklock),"blklock");
-    }
-
-    println("block read...");
-
-    virt_disk_rw(&b[0],write);
-        
-}
 
 // 找到一个空闲描述符，将其标记为非空闲，返回它的索引
 static int alloc_desc() {
@@ -248,10 +217,6 @@ void virtio_disk_init() {
   memset(disk.pages, 0, sizeof(disk.pages));
   *R(VIRTIO_MMIO_QUEUE_PFN) = ((uint64)disk.pages) >> PGSHIFT;
 
-  // desc = pages -- num * virtq_desc
-  // avail = pages + 0x40 -- 2 * uint16, then num * uint16
-  // used = pages + 4096 -- 2 * uint16, then num * vRingUsedElem
-
   disk.desc = (struct virt_desc *) disk.pages;
   disk.avail = (struct virt_avail *)(disk.pages + NUM*sizeof(struct virt_desc));
   disk.used = (struct virt_used *) (disk.pages + PGSIZE);
@@ -264,14 +229,10 @@ void virtio_disk_init() {
 
 void virtio_disk_isr()
 {
-  //lock_acquire(&disk.vdisk_lock);
 
   *R(VIRTIO_MMIO_INTERRUPT_ACK) = *R(VIRTIO_MMIO_INTERRUPT_STATUS) & 0x3;
 
   __sync_synchronize();
-
-  // the device increments disk.used->idx when it
-  // adds an entry to the used ring.
 
   while (disk.used_idx != disk.used->idx) {
     __sync_synchronize();
@@ -279,10 +240,9 @@ void virtio_disk_isr()
     if (disk.info[id].status != 0){
       println("virtio_disk_intr status");
     }
-    struct blk *b = disk.info[id].b;
+    struct buf *b = disk.info[id].b;
     b->disk = 0;
     disk.used_idx += 1;
   }
 
-  //lock_free(&disk.vdisk_lock);
 }

@@ -1,7 +1,6 @@
 struct sleeplock{
     uint locked;
-    struct spinlock spin_lock;
-
+    struct spinlock splock;
     char *name;
     int pid;
-}
+};

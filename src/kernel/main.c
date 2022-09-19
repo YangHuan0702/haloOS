@@ -13,7 +13,6 @@ int main(){
     user_init();
     virtio_disk_init();
     intr_on();
-    virtio_tester(0);
     while(1){
         // printf("#: ");
         // while (getShellResult() == 0) {
