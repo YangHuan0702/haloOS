@@ -40,8 +40,8 @@ kernel: $(OBJS) src/kernel/os.ld
 	$(LD) -z max-page-size=4096 -T src/kernel/os.ld -o src/kernel/kernel $(OBJS)
 	$(OBJDUMP) -S src/kernel/kernel > src/kernel/kernel.asm
 
-hdd.dsk:
-	dd if=/dev/urandom of=hdd.dsk bs=1M count=32
+#hdd.dsk:
+#	dd if=/dev/urandom of=hdd.dsk bs=1M count=32
 
 QEMUOPTS = -machine virt -bios none -kernel src/kernel/kernel -m 128M -smp 1 -nographic
 
@@ -56,7 +56,7 @@ gdb: src/kernel/kernel
 #QFLAGS += -drive if=none,format=raw,file=hdd.dsk,id=x0
 #QFLAGS += -device virtio-blk-device,drive=x0,bus=virtio-mmio-bus.0
 
-qemu: $(TARGET) hdd.dsk
+qemu: $(TARGET) 
 	@qemu-system-riscv64 -M ? | grep virt >/dev/null || exit
 	@echo "Press Ctrl-A and then X to exit QEMU"
 	$(QEMU) $(QFLAGS) -kernel src/kernel/kernel
