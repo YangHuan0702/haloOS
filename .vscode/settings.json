@@ -9,7 +9,8 @@
         "exception": "c",
         "riscv.h": "c",
         "virt.h": "c",
-        "sleeplock.h": "c"
+        "sleeplock.h": "c",
+        "file.h": "c"
     },
     "C_Cpp.errorSquiggles": "Disabled"
 }

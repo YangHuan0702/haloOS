@@ -25,6 +25,7 @@
 
 #define NDIRECT 12
 
+
 #define PGSIZE 4096
 #define PGSHIFT 12  // 页内的偏移量
 
@@ -33,6 +34,13 @@
 #define T_DEVICE  3   // Device
 
 #define FSMAGIC 0x10203040
+
+#define DIR_MAX_FILES 16
+
+#define O_RDONLY  0x000
+#define O_WRONLY  0x001
+#define O_RDWR    0x002
+#define O_CREATE  0x200
 
 struct buf {
     int vaild;
@@ -83,13 +91,9 @@ struct dinode {
   uint addrs[NDIRECT+1];   // Data block addresses
 };
 
-struct file {
-  enum { FD_NONE, FD_PIPE, FD_INODE, FD_DEVICE } type;
-  int ref;            // reference count
-  char readable;
-  char writable;
-  struct pipe *pipe; // FD_PIPE
-  struct inode *ip;  // FD_INODE and FD_DEVICE
-  uint off;          // FD_INODE
-  short major;       // FD_DEVICE
+struct dirent {
+  ushort nums;
+  char numsname[DIR_MAX_FILES];
 }
+
+
