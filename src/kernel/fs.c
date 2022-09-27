@@ -6,6 +6,7 @@
 #define NBUF 16
 #define INODES 32
 
+
 struct {
     struct spinlock slock;
     struct buf bufs[NBUF];
@@ -16,7 +17,6 @@ struct {
     struct spinlock slock;
     struct inode inodes[INODES];
 } inodecache;
-
 
 void init_bcache() {
     bcache.slock.locked = 0;
@@ -39,14 +39,25 @@ void init_inodecache() {
     }
 }
 
+struct inode* allocinode(){
+    
+}
+
+struct inode* create(char *path){
+    struct file *f = filealloc();
+
+}
+
 
 int open(char *path, int model){
 
     int fd;
 
+    struct inode *node;
+
     // 创建
     if(model & O_CREATE){
-        
+        node = create(path);
     } 
 
 

@@ -3,6 +3,7 @@ struct spinlock;
 struct buf;
 struct superblock;
 struct sleeplock;
+struct file;
 
 // swtch.S
 void swtch(struct context*, struct context*);
@@ -22,6 +23,9 @@ void user_init();
 void run_target_task_num(int);
 void run_os_task();
 
+// file.c
+void init_filecache();
+struct file* filealloc();
 
 // memlayout.c
 void uart_putstr(char*);
