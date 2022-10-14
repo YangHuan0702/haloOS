@@ -15,7 +15,7 @@ struct proc {
   uint pid;
   
   struct context cont;
-  struct file *openfs[NOFILE];
+  struct file *openfs[OPENFILE];
   struct inode *pwd;
 };
 

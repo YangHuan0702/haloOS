@@ -18,6 +18,7 @@ struct {
     struct inode inodes[INODES];
 } inodecache;
 
+
 void init_bcache() {
     bcache.slock.locked = 0;
     bcache.slock.name = "bcache";
@@ -39,25 +40,51 @@ void init_inodecache() {
     }
 }
 
-struct inode* allocinode(){
+static struct inode* create(char *path,short type,short major,short minor){
     
 }
 
-struct inode* create(char *path){
-    struct file *f = filealloc();
 
+
+struct inode* getInodeByDevAndINum(uint dev,uint inum){
+    lock(&inodecache.slock);
+    struct inode* i;
+    struct inode* r = 0;
+    for(i = &inodecache.inodes[0]; i < &inodecache.inodes[INODES]; i++){
+        if(i->ref > 0 && i->dev == dev && i->inum == inum){
+            i->ref++;
+            unlock(&inodecache.slock);
+            return i;
+        }
+        if(i->ref == 0 && r == 0){
+            r = i;
+        }
+    }
+    if(r == 0){
+        println("getInodeByDevAndINum panic");
+        for(;;){
+        }
+    }
+
+    r->dev = dev;
+    r->inum = inum;
+    r->ref = 1;
+    r->vaild = 0;
+    unlock(&inodecache.slock);
+    return r;
 }
-
 
 int open(char *path, int model){
 
     int fd;
 
-    struct inode *node;
+    struct inode *n;
+
+    struct inode *parent = getInodeByDevAndINum(ROOTDEV,ROOTINO);
 
     // 创建
     if(model & O_CREATE){
-        node = create(path);
+        create();
     } 
 
 
@@ -68,3 +95,6 @@ int open(char *path, int model){
 void bread(){
     
 }
+
+
+

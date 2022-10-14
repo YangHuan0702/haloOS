@@ -1,4 +1,6 @@
-#define NOFILE 16
+#define OPENFILE 16
+#define ROOTDEV 1
+#define ROOTINO 1
 
 struct file {
   enum { FD_NONE, FD_PIPE, FD_INODE, FD_DEVICE } type;

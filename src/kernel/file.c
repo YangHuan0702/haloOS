@@ -1,6 +1,7 @@
 #include "type.h"
 #include "defs.h"
 #include "file.h"
+#include "fs.h"
 
 #define NFILE 100
 
@@ -10,7 +11,7 @@ struct {
 } filecache;
 
 void init_filecache(){
-    initlock(&filecache.slock),"filecache";
+    initlock(&filecache.slock,"filecache");
     for(int i = 0;i < NFILE;i++){
         filecache.files[i].type = FD_NONE;
         filecache.files[i].ref = 0;
