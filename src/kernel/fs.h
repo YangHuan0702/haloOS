@@ -24,6 +24,10 @@
 #define BSIZE 1024
 
 #define NDIRECT 12
+#define NLOG 30
+#define NINODE 14
+#define BITMAPN 1
+#define FSSIZE 1000
 
 
 #define PGSIZE 4096

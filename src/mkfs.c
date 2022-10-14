@@ -2,6 +2,16 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include "kernel/fs.h"
+
+int nlog = NLOG;
+int nInode = NINODE;
+int bitmapn = BITMAPN;
+int nmeta;
+int nblocks;
+
+struct superblock sb;
+
 int main(int argc,char *argv[]){
     printf("---------- mkfs start -------------\n");
     for(int i =0;i< argc;i++){
@@ -20,7 +30,12 @@ int main(int argc,char *argv[]){
         exit(1);
     }    
 
+    nmeta = 2 + nlog + nInode + bitmapn;
+    nblocks = FSSIZE - nmeta;
 
+    sb.magic = FSMAGIC;
     
 
+
+    exit(0);
 }
