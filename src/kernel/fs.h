@@ -44,8 +44,7 @@
 #define O_RDONLY  0x000
 #define O_WRONLY  0x001
 #define O_RDWR    0x002
-#define 
-O_CREATE  0x200
+#define O_CREATE  0x200
 
 struct buf {
     int vaild;
@@ -68,6 +67,7 @@ struct superblock {
   uint logstart;     // Block number of first log block
   uint inodestart;   // Block number of first inode block
   uint bmapstart;    // Block number of first free map block
+  uint dataStart;    // Block number of first date block
 };
 
 struct inode {
@@ -97,8 +97,16 @@ struct dinode {
 };
 
 struct dirent {
-  ushort nums;
-  char numsname[DIR_MAX_FILES];
+  ushort inum;
+  char name[DIR_MAX_FILES];
 }
 
+#define IPB (BSIZE / sizeof(struct dinode))
 
+#define IBLOCK(i,sb) ((i) / IPB + sb.inodestart)
+
+#define NDIRECT 12
+#define NINDIRECT (BSIZE / sizeof(uint))
+#define MAXFILE (NDIRECT + NINDIRECT)
+
+#define DIRSIZ 14
