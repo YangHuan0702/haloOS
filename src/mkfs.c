@@ -171,6 +171,8 @@ int main(int argc,char *argv[]){
         exit(1);
     }    
 
+    printf(argv[1]);
+
     nmeta = 2 + nlog + nInode + bitmapn;
     nblocks = FSSIZE - nmeta;
 
@@ -214,7 +216,7 @@ int main(int argc,char *argv[]){
     iappend(rootinode,&de,sizeof(de));
 
     int fd,inum,cc;
-    for(int i = 1;i < argc;i++){
+    for(int i = 2;i < argc;i++){
         char *shortname;
         if(strncmp(argv[i],"src/user/",9) == 0){
             shortname = argv[i] + 9;
@@ -222,11 +224,13 @@ int main(int argc,char *argv[]){
             shortname = argv[i];
         }
 
+        printf("++++++++++\n");
+        printf(shortname);
 
-        if(index(shortname,'/') == 0){
-            printf("shortname start / \n");
-            exit(1);
-        }
+        // if(index(shortname,'/') == 0){
+        //     printf("shortname start / \n");
+        //     exit(1);
+        // }
 
         if((fd = open(argv[i],0)) < 0){
             printf("%s not exist \n",argv[i]);
