@@ -93,4 +93,4 @@ qemu: $(TARGET)
 
 clean:
 	rm -f *.elf src/kernel/*.o src/kernel/kernel src/kernel/kernel.asm
-	rm -f src/user/*.o src/mkfs fs.img
+	rm -f src/user/*.o src/mkfs fs.img src/user/*.sym src/user/*.asm $(USERS)
