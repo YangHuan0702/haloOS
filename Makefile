@@ -25,6 +25,12 @@ OBJS = \
 		 src/kernel/util.o \
 		 src/kernel/sleeplock.o \
 
+USERS = \
+		src/user/_ls\
+
+
+
+
 .PRECIOUS: %.o
 
 src/kernel/%.o: src/kernel/%.c
@@ -33,12 +39,30 @@ src/kernel/%.o: src/kernel/%.c
 
 OBJDUMP = riscv64-unknown-elf-objdump
 LD = riscv64-unknown-elf-ld
+KERNELOPTS = -drive file=fs.img,if=none,format=raw,id=x0
+KERNELOPTS += -device virtio-blk-device,drive=x0,bus=virtio-mmio-bus.0
+
+LDFLAGS = -z max-page-size=4096
+
+_%: %.o
+	$(LD) $(LDFLAGS) -N -e main -Ttext 0 -o $@ $^
+	$(OBJDUMP) -S $@ > $*.asm
+	$(OBJDUMP) -t $@ | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$$/d' > $*.sym
+
+
 
 all: os.elf
 
-kernel: $(OBJS) src/kernel/os.ld
+kernel: $(OBJS) src/kernel/os.ld fs.img
 	$(LD) -z max-page-size=4096 -T src/kernel/os.ld -o src/kernel/kernel $(OBJS)
 	$(OBJDUMP) -S src/kernel/kernel > src/kernel/kernel.asm
+	$(KERNELOPTS)
+	
+src/mkfs: src/mkfs.c src/kernel/fs.h src/kernel/file.h src/kernel/stat.h
+	gcc -Werror -Wall -I. -o src/mkfs src/mkfs.c
+
+fs.img:	src/mkfs $(USERS)
+	src/mkfs fs.img $(USERS)
 
 #hdd.dsk:
 #	dd if=/dev/urandom of=hdd.dsk bs=1M count=32
@@ -63,3 +87,4 @@ qemu: $(TARGET)
 
 clean:
 	rm -f *.elf src/kernel/*.o src/kernel/kernel src/kernel/kernel.asm
+	rm -f src/user/*.o

@@ -1,7 +1,6 @@
-#include "proc.h"
+#include "type.h"
 #include "defs.h"
 #include "riscv.h"
-#include "spinlock.h"
 
 int main(){
    

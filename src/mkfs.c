@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <fcntl.h>
 
 #include "kernel/fs.h"
 #include "kernel/file.h"
@@ -98,12 +99,12 @@ uint ialloc(ushort type){
 
 void iappend(uint inum,void *xp,int n){
     char *c = (char*) xp;
-    struct dinode *d;
+    struct dinode d;
     rinode(inum,&d);
     uint indirect[NINDIRECT];
     char buf[BSIZE];
     uint fbn,off,x,n1;
-    off = xint(d->size);
+    off = xint(d.size);
     while (n > 0) {
         fbn = off / BSIZE;
         if(fbn > MAXFILE){
@@ -111,15 +112,15 @@ void iappend(uint inum,void *xp,int n){
             exit(1);
         }
         if(fbn < NDIRECT){
-            if(xint(d->addrs[fbn]) == 0){
-                d->addrs[fbn] = xint(freeBlock++);
+            if(xint(d.addrs[fbn]) == 0){
+                d.addrs[fbn] = xint(freeBlock++);
             }
-            x = xint(d->addrs[fbn]);
+            x = xint(d.addrs[fbn]);
         }else{
-            if(xint(d->addrs[NDIRECT] == 0)){
-                d->addrs[NDIRECT] = xint(freeBlock++);
+            if(xint(d.addrs[NDIRECT] == 0)){
+                d.addrs[NDIRECT] = xint(freeBlock++);
             }
-            rsect(xint(d->addrs[NDIRECT]),(char*)indircet);
+            rsect(xint(d.addrs[NDIRECT]),(char*)indirect);
             if(indirect[fbn - NDIRECT] == 0){
                 indirect[fbn - NDIRECT] = xint(freeBlock++);
                 wsect(xint(d.addrs[NDIRECT]), (char*)indirect);
@@ -134,7 +135,7 @@ void iappend(uint inum,void *xp,int n){
         off += n1;
         c += n1;
     }
-    d->size = xint(off);
+    d.size = xint(off);
     winode(inum,&d);
 }
 
@@ -160,13 +161,13 @@ int main(int argc,char *argv[]){
     }
 
     if(argc < 2){
-        printf("argc params panic...");
+        printf("argc params panic...\n");
         exit(1);
     }
 
     fsfd = open(argv[1],O_RDWR | O_CREAT | O_TRUNC,0666);
     if(fsfd < 0 ){
-        printf("open img panic...");
+        printf("open img panic...\n");
         exit(1);
     }    
 
@@ -196,7 +197,7 @@ int main(int argc,char *argv[]){
     wsect(1,buf);
 
     uint rootinode = ialloc(T_DIR);
-    if(rootialloc != ROOTINO){
+    if(rootinode != ROOTINO){
         printf("ialloc rootinode != ROOTINO(1)\n");
         exit(1);
     }
@@ -204,7 +205,7 @@ int main(int argc,char *argv[]){
     struct dirent de;
     bzero(&de,sizeof(de));    
     de.inum = xshort(rootinode);
-    strcopy(de.name,".");
+    strcpy(de.name,".");
     iappend(rootinode,&de,sizeof(de));
 
     bzero(&de,sizeof(de));
@@ -213,10 +214,10 @@ int main(int argc,char *argv[]){
     iappend(rootinode,&de,sizeof(de));
 
     int fd,inum,cc;
-    for(int i = 2;i < argc;i++){
+    for(int i = 1;i < argc;i++){
         char *shortname;
-        if(strncmp(argv[i],"user/",5) == 0){
-            shortname = argv[i] + 5;
+        if(strncmp(argv[i],"src/user/",9) == 0){
+            shortname = argv[i] + 9;
         }else{
             shortname = argv[i];
         }
@@ -239,7 +240,7 @@ int main(int argc,char *argv[]){
         inum = ialloc(T_FILE);
         bzero(&de, sizeof(de));
         de.inum = xshort(inum);
-        strcpy(de.name,shortname,DIRSIZ);
+        strncpy(de.name,shortname,DIRSIZ);
         iappend(rootinode,&de,sizeof(de));
 
         while((cc = read(fd,buf,sizeof(buf)))  > 0){

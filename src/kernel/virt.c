@@ -7,7 +7,7 @@
 
 #define R(addr) ((volatile uint32*)(VIRTIO_MMIO_BASE + (addr)))
 
-static struct disk{6
+static struct disk{
     char pages[2 * PGSIZE];
 
     struct virt_desc *desc;

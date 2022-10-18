@@ -1,4 +1,4 @@
-#include "kernel/print.h"
+#include "src/kernel/print.h"
 
 int main(int argc,char *args[]){
     println("ls ...");

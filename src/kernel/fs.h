@@ -84,7 +84,7 @@ struct inode {
   short nlink;      
   uint size;     
   uint addrs[NDIRECT+1]; 
-}
+};
 
 // disk inode 
 struct dinode {
@@ -99,7 +99,7 @@ struct dinode {
 struct dirent {
   ushort inum;
   char name[DIR_MAX_FILES];
-}
+};
 
 #define IPB (BSIZE / sizeof(struct dinode))
 

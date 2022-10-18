@@ -1,4 +1,5 @@
-struct spinlock{
-    uint locked;
-    char* name;
+struct spinlock {
+  uint locked;     
+
+  char *name;        
 };

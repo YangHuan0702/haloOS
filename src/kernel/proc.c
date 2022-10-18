@@ -1,5 +1,9 @@
-#include "proc.h"
+#include "type.h"
 #include "defs.h"
+#include "memlayout.h"
+#include "file.h"
+#include "spinlock.h"
+#include "proc.h"
 
 uint64 task_stack[MAX_TASK][STACK_SIZE];
 struct context tasks[MAX_TASK];
@@ -53,8 +57,7 @@ void user_task1() {
 }
 
 
-int task_create(void (*task)())
-{
+int task_create(void (*task)()) {
 	int i=taskTop++;
 	tasks[i].ra = (uint64) task;
 	tasks[i].sp = (uint64) &task_stack[i][STACK_SIZE-1];

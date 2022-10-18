@@ -12,7 +12,8 @@
         "sleeplock.h": "c",
         "file.h": "c",
         "stat.h": "c",
-        "fs.h": "c"
+        "fs.h": "c",
+        "spinlock.h": "c"
     },
     "C_Cpp.errorSquiggles": "Disabled"
 }
