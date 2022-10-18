@@ -42,10 +42,10 @@ LD = riscv64-unknown-elf-ld
 
 LDFLAGS = -z max-page-size=4096
 
-# _%: %.o
-# 	$(LD) $(LDFLAGS) -N -e main -Ttext 0 -o $@ $^
-# 	$(OBJDUMP) -S $@ > $*.asm
-# 	$(OBJDUMP) -t $@ | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$$/d' > $*.sym
+_%: %.o
+	$(LD) $(LDFLAGS) -N -e main -Ttext 0 -o $@ $^
+	$(OBJDUMP) -S $@ > $*.asm
+	$(OBJDUMP) -t $@ | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$$/d' > $*.sym
 
 
 
@@ -86,11 +86,11 @@ gdb: src/kernel/kernel
 #QFLAGS += -drive if=none,format=raw,file=hdd.dsk,id=x0
 #QFLAGS += -device virtio-blk-device,drive=x0,bus=virtio-mmio-bus.0
 
-qemu: $(TARGET) 
-	@qemu-system-riscv64 -M ? | grep virt >/dev/null || exit
-	@echo "Press Ctrl-A and then X to exit QEMU"
-	$(QEMU) $(QFLAGS) -kernel src/kernel/kernel
+# qemu: $(TARGET) fs.img
+# 	@qemu-system-riscv64 -M ? | grep virt >/dev/null || exit
+# 	@echo "Press Ctrl-A and then X to exit QEMU"
+# 	$(QEMU) $(QFLAGS) -kernel src/kernel/kernel
 
 clean:
 	rm -f *.elf src/kernel/*.o src/kernel/kernel src/kernel/kernel.asm
-	rm -f src/user/*.o src/mkfs fs.img src/user/*.sym src/user/*.asm $(USERS)
+	rm -f src/user/*.o src/user/*.sym src/user/*.asm $(USERS)

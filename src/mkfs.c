@@ -261,5 +261,6 @@ int main(int argc,char *argv[]){
     winode(rootinode,&din);
 
     balloc(freeBlock);
+    printf("mkfs success!\n");
     exit(0);
 }

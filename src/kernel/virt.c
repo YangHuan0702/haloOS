@@ -162,6 +162,11 @@ void virtio_disk_init() {
   initlock(&disk.disklock, "virtlock");
 
   //校验磁盘是否存在
+  uint64 magic = *R(VIRTIO_MMIO_MAGIC_VALUE);
+  uint64 ver = *R(VIRTIO_MMIO_VERSION);
+  uint64 deviceId = *R(VIRTIO_MMIO_DEVICE_ID);
+  uint64 vendor = *R(VIRTIO_MMIO_VENDOR_ID);
+  printf("magic:%p,ver:%d,deviceId:%d,vendor:%p\n",magic,ver,deviceId,vendor);
   if(*R(VIRTIO_MMIO_MAGIC_VALUE) != 0x74726976 ||     // virtio-v1.1[4.2.2.2] The driver MUST ignore a device with MagicValue which is not 0x74726976
      *R(VIRTIO_MMIO_VERSION) != 1 ||              
      *R(VIRTIO_MMIO_DEVICE_ID) != 2 ||
