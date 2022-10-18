@@ -83,7 +83,7 @@ int open(char *path, int model){
     struct inode *parent = getInodeByDevAndINum(ROOTDEV,ROOTINO);
 
     // 创建
-    if(model & O_CREATE){
+    if(model & H_CREATE){
         create();
     } 
 

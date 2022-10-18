@@ -140,7 +140,16 @@ void iappend(uint inum,void *xp,int n){
 
 
 void balloc(int used){
-
+    char buf[BSIZE];
+    if(used > BSIZE * 8){
+        printf("used overflow...\n");
+        exit(1);
+    }
+    bzero(buf,BSIZE);
+    for(int i = 0;i < used;i++){
+        buf[i / 8] = buf[i / 8] | (1 << (i%8));
+    }
+    wsect(sb.bmapstart,buf);
 }
 
 int main(int argc,char *argv[]){

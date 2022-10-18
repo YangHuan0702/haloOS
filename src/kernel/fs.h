@@ -41,10 +41,10 @@
 
 #define DIR_MAX_FILES 16
 
-#define O_RDONLY  0x000
-#define O_WRONLY  0x001
-#define O_RDWR    0x002
-#define O_CREATE  0x200
+#define H_RDONLY  0x000
+#define H_WRONLY  0x001
+#define H_RDWR    0x002
+#define H_CREATE  0x200
 
 struct buf {
     int vaild;
