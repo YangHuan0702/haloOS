@@ -6,10 +6,17 @@
 
 static char nums[] = "0123456789abcdef";
 
+static struct {
+    struct spinlock slock;
+    int locking;
+} pr;
 
+static volatile int panicked = 0;
 
 void printinit(){
     uartinit();
+    initlock(&pr.slock,"pr");
+    pr.locking = 1;
 }
 
 static void printInt(int val,int u){
@@ -58,6 +65,9 @@ void printf(char *s, ...){
     if(s == 0){
         return;
     }
+    if(pr.locking){
+        lock(&pr.slock);
+    }
     va_list ap;
     va_start(ap,s);
     char *str;
@@ -90,6 +100,9 @@ void printf(char *s, ...){
             break;
         }
     }    
+    if(pr.locking){
+        unlock(&pr.slock);
+    }
 }
 
 
@@ -101,4 +114,14 @@ void println(char *s){
     char *nextLine = "\n";
     uart_putstr(s);
     uart_putstr(nextLine);
+}
+
+void panic(char *str){
+    pr.locking = 0;
+    print("panic:");
+    print(str);
+    print("\n");
+    panicked = 1;
+    for(;;){
+    }
 }

@@ -4,6 +4,8 @@ struct buf;
 struct superblock;
 struct sleeplock;
 struct file;
+struct cpu;
+struct proc;
 
 // swtch.S
 void swtch(struct context*, struct context*);
@@ -12,6 +14,9 @@ void swtch(struct context*, struct context*);
 void lock(struct spinlock*);
 void unlock(struct spinlock*);
 void initlock(struct spinlock*,char*);
+void push_off();
+void pop_off();
+
 
 void sleep_lock(struct sleeplock*);
 void sleep_unlock(struct sleeplock*);
@@ -22,6 +27,10 @@ int get_tasks();
 void user_init();
 void run_target_task_num(int);
 void run_os_task();
+struct cpu* mycpu();
+int cpuid();
+struct proc* myproc();
+int allocpid();
 
 // file.c
 void init_filecache();
@@ -51,6 +60,7 @@ void print(char*);
 void println(char*);
 void printP(uint64);
 void printinit();
+void panic(char*);
 
 // virt.c
 void virtio_disk_init();

@@ -17,6 +17,10 @@ static inline void w_sstatus(uint64 x) {
   asm volatile("csrw sstatus, %0" : : "r" (x));
 }
 
+static inline int intr_get(){
+    return (r_sstatus() & SSTATUS_SIE) != 0;
+}
+
 static inline void intr_on() {
   w_sstatus(r_sstatus() | SSTATUS_SIE);
 }

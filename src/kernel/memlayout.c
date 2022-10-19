@@ -7,12 +7,21 @@
 #define EOF 0
 #define CMD_BUFF 128
 
+extern volatile int panicked;
+
 void uart_putc(char c){
+  if(panicked){
+      for(;;){}
+  }
     while ((ReadReg(LSR) & LM5) == 0){}
     WriteReg(THR,c);
 }
 
 void uart_putstr(char* s){
+  if(panicked){
+    for(;;){
+    }
+  }
     while (*s)
     {
         uart_putc(*s++); 
