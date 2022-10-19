@@ -1,3 +1,3 @@
 
 // system call
-int write(int,char,int);
+int write(int,char*,int);

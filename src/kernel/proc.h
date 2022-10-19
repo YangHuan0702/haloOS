@@ -32,4 +32,9 @@ struct proc {
 };
 
 
-
+struct cpu{
+  struct proc *p;
+  struct context context;
+  int noff;
+  int intena;
+};
