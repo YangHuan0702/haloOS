@@ -41,9 +41,13 @@ void init_inodecache() {
 }
 
 static struct inode* create(char *path,short type,short major,short minor){
-    
+    return 0;
 }
 
+
+struct inode* readi(struct inode* ip,int user_dst,uint64 dst,uint off,uint n){
+    
+}
 
 
 struct inode* getInodeByDevAndINum(uint dev,uint inum){
@@ -61,9 +65,7 @@ struct inode* getInodeByDevAndINum(uint dev,uint inum){
         }
     }
     if(r == 0){
-        println("getInodeByDevAndINum panic");
-        for(;;){
-        }
+        panic("getInodeByDevAndINum panic");
     }
 
     r->dev = dev;

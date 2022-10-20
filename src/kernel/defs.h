@@ -17,10 +17,13 @@ void initlock(struct spinlock*,char*);
 void push_off();
 void pop_off();
 
-
+// sleeplock.c
 void sleep_lock(struct sleeplock*);
 void sleep_unlock(struct sleeplock*);
 void sleep_initlock(struct sleeplock*,char*);
+
+// exec.c
+int exec(char*,char**);
 
 // proc.c
 int get_tasks();
@@ -53,6 +56,10 @@ void complate_irq(int);
 
 // trap.c
 void trapinit();
+
+
+// fs.c
+struct inode* getInodeByDevAndINum(uint,uint);
 
 // print.c
 void printf(char*, ...);
