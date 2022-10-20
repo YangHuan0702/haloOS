@@ -103,6 +103,9 @@ struct dirent {
 
 #define IPB (BSIZE / sizeof(struct dinode))
 
+#define BPB (BSIZE * 8)
+#define BMAPBLOCK(b,sb) ((b)/BPB + sb.bmapstart)
+
 #define IBLOCK(i,sb) ((i) / IPB + sb.inodestart)
 
 #define NDIRECT 12

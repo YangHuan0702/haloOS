@@ -6,6 +6,7 @@
 #define NBUF 16
 #define INODES 32
 
+struct superblock sb;
 
 struct {
     struct spinlock slock;
@@ -45,8 +46,65 @@ static struct inode* create(char *path,short type,short major,short minor){
 }
 
 
+struct buf* bread(uint dev,uint blockno){
+    struct buf *r;
+    bget();
+
+    return 0; 
+}
+
+
+static uint balloc(uint dev){
+    for(int b = 0; b < sb.size; b += BPB){
+        struct buf *bp = bread(dev,BMAPBLOCK(b,sb));
+        for(int bi = 0; bi < BPB && b + bi < sb.size;bi++){
+            int m = 1 << (bi % 8);
+            if((bp->data[bi/8] & m) == 0){
+                bp->data[bi/8] |= m;
+                return b+bi;
+            }
+        }
+    }
+    panic("balloc panic...\n");
+    return -1;
+}
+
+static uint bmap(struct inode* ip,uint n){
+    uint addr;
+    if(n < NDIRECT){
+        if((addr = ip->addrs[n]) == 0){
+            addr = ip->addrs[n] = balloc(ip->dev);
+        }
+        return addr;
+    }
+    n -= NDIRECT;
+    if(n < NINDIRECT){
+        if((addr = ip->addrs[NDIRECT]) == 0){
+            ip->addrs[NDIRECT] = addr = balloc(ip->dev);
+        }
+        struct buf *bp = bread(ip->dev, addr);
+        uint *a = (uint*)bp->data;
+        if((addr = a[n]) == 0){
+            a[n] = addr = balloc(ip->dev);
+        }
+        return addr;
+    }
+    panic("bmap panic...\n");
+}
+
+
 struct inode* readi(struct inode* ip,int user_dst,uint64 dst,uint off,uint n){
-    
+    if(off > ip->size || off + n < off) {
+        return 0;
+    }
+    if(off + n > ip->size) {
+        n = ip->size - off;
+    }
+    struct buf *b;
+    uint tot,m;
+    for(tot = 0; tot < n; tot+=m,dst+=m){
+        bread(ip->dev,bmap(ip,off/BSIZE));
+    }
 }
 
 
@@ -92,11 +150,4 @@ int open(char *path, int model){
 
     return 0;
 }
-
-
-void bread(){
-    
-}
-
-
 
