@@ -3,6 +3,7 @@
 
 
 uint64 sys_exec(){
-    char *path = "init";
-    exec(path,0);
+    char *path = "/init";
+    int ret = exec(path,0);
+    return ret;
 }

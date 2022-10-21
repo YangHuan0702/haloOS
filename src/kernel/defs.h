@@ -59,7 +59,10 @@ void trapinit();
 
 
 // fs.c
-struct inode* getInodeByDevAndINum(uint,uint);
+struct inode* iget(uint,uint);
+struct buf* bread(uint,uint);
+int readi(struct inode*,int,uint64,uint,uint);
+struct inode* inodeByName(struct inode*,char*);
 
 // print.c
 void printf(char*, ...);
@@ -74,6 +77,10 @@ void virtio_disk_init();
 void virt_disk_rw(struct buf*,int);
 void virtio_disk_isr();
 
+// spaceswap.c
+void* copyout(void*,void*,int);
 
 // uitl.c
 char* memset(void*,int,int);
+void* memmove(void*,void*,int);
+int strncmp(const char*,const char*,int);

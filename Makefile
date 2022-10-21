@@ -24,9 +24,11 @@ OBJS = \
 		 src/kernel/virt.o \
 		 src/kernel/util.o \
 		 src/kernel/sleeplock.o \
+		 src/kernel/spaceswap.o \
 
 USERS = \
 		src/user/_ls\
+		src/user/_init\
 
 
 

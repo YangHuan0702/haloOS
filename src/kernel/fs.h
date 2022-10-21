@@ -39,7 +39,7 @@
 
 #define FSMAGIC 0x10203040
 
-#define DIR_MAX_FILES 16
+#define DIR_MAX_FILES 14
 
 #define H_RDONLY  0x000
 #define H_WRONLY  0x001
@@ -95,10 +95,11 @@ struct dinode {
   uint size;            // Size of file (bytes)
   uint addrs[NDIRECT+1];   // Data block addresses
 };
+#define DIRSIZ 14
 
 struct dirent {
   ushort inum;
-  char name[DIR_MAX_FILES];
+  char name[DIRSIZ];
 };
 
 #define IPB (BSIZE / sizeof(struct dinode))
@@ -111,5 +112,5 @@ struct dirent {
 #define NDIRECT 12
 #define NINDIRECT (BSIZE / sizeof(uint))
 #define MAXFILE (NDIRECT + NINDIRECT)
+#define 
 
-#define DIRSIZ 14
