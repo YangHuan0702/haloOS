@@ -3,7 +3,7 @@
 #include "riscv.h"
 
 int main(){
-   
+    consoleinit();
     printinit();
     trapinit();
     plicinit();

@@ -21,6 +21,13 @@ struct {
     struct inode inodes[INODES];
 } inodecache;
 
+void initfs(){
+    readsb();
+    if(sb.magic != FSMAGIC){
+        panic("invalid file system");
+    }
+    
+}
 
 void init_bcache() {
     bcache.slock.locked = 0;

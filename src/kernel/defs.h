@@ -57,6 +57,8 @@ void complate_irq(int);
 // trap.c
 void trapinit();
 
+// console.c
+void consoleinit();
 
 // fs.c
 struct inode* iget(uint,uint);

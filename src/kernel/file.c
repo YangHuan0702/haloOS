@@ -5,6 +5,8 @@
 
 #define NFILE 100
 
+struct devsw devsw[NDEV];
+
 struct {
     struct spinlock slock;
     struct file files[NFILE];
