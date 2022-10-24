@@ -10,3 +10,25 @@ uint copyout(int user_dst,uint64 dst,void *src,int n){
         return 0;
     }
 }
+
+int either_copyout(int user_dst,uint64 dst,void *src,uint64 len){
+    struct proc *p = myproc();
+    if(user_dst){
+        // kernel -> user
+    }else{
+        memmove((char*)dst,src,len);
+        return 0;
+    }
+    return -1;
+}
+
+int either_copy(void *dst,int user_src,uint64 src,uint64 len) {
+    struct proc *proc  = myproc();
+    if(user_src){
+        // user -> kernel
+    }else{
+        memmove(dst,char*(src),len);
+        return 0;
+    }
+    return -1;
+}

@@ -88,6 +88,9 @@ void virtio_disk_isr();
 
 // spaceswap.c
 void* copyout(void*,void*,int);
+int either_copy(void*,int,uint64,uint64);
+int either_copyout(int,uint64,void*,uint64);
+
 
 // uitl.c
 char* memset(void*,int,int);
