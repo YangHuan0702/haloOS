@@ -1,7 +1,6 @@
 #include "type.h"
 #include "defs.h"
 
-
 static uint64 argptr(int num){
     struct proc *proc = mycpu();
     switch (num) {
@@ -33,4 +32,9 @@ int argstr(int num,char *buf,int size){
     uint64 addr;
     argaddr(num,&addr);
     return getstr(addr,buf,size);
+}
+
+int argint(int n,int *ip){
+    *ip = argptr(n);
+    return 0;
 }

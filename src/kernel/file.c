@@ -32,3 +32,15 @@ struct file* filealloc(){
     unlock(&file.slock);
     println("filealloc error");
 }
+
+
+struct  file* filedup(struct file* f){
+    lock(&filecache.slock);
+    if(f->ref < 1){
+        panic("filedup | target file ref < 1..");
+    }
+    f->ref++;
+    unlock(&filecache.slock);
+    return f;
+} 
+

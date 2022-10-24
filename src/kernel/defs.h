@@ -25,6 +25,11 @@ void sleep_initlock(struct sleeplock*,char*);
 // exec.c
 int exec(char*,char**);
 
+// argsuitl.c
+void argaddr(int,uint64*);
+int argstr(int,char*,int);
+int argint(int,int*);
+
 // proc.c
 int get_tasks();
 void user_init();
@@ -38,6 +43,8 @@ int allocpid();
 // file.c
 void init_filecache();
 struct file* filealloc();
+struct file* filedup(struct file*);
+
 
 // memlayout.c
 void uart_putstr(char*);

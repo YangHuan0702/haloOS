@@ -5,10 +5,12 @@
 
 extern uint64 sys_write(void);
 extern uint64 sys_exec(void);
+extern uint64 sys_dup(void);
 
 static uint64 (*syscall[])(void) = {
     [SYS_WRITE] sys_write,
     [SYS_EXEC]  sys_exec,
+    [SYS_DUP]  sys_dup,
 }
 
 void syscall(){
