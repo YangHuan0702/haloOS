@@ -3,6 +3,8 @@
 #define ROOTINO 1
 #define NDEV 10
 
+#define MAXPATH 128
+
 #define CONSOLE 1
 
 struct file {

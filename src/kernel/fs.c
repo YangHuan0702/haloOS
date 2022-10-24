@@ -50,10 +50,6 @@ void init_inodecache() {
     }
 }
 
-static struct inode* create(char *path,short type,short major,short minor){
-    return 0;
-}
-
 static struct buf* bget(uint dev,uint blockno){
     struct buf* r
     lock(&bcache.slock);
@@ -192,20 +188,55 @@ struct inode* inodeByName(struct inode* ip,char* name){
 }
 
 
-int open(char *path, int model){
-
-    int fd;
-
-    struct inode *n;
-
-    struct inode *parent = getInodeByDevAndINum(ROOTDEV,ROOTINO);
-
-    // 创建
-    if(model & H_CREATE){
-        create();
-    } 
-
-
+struct inode* ialloc(uint dev,short type) {
+    int inum;
+    struct buf *bp;
+    struct dinode *d;
+    for(inum = 0;inum < sb.ninodes; inum++){
+        bp = bread(dev,IBLOCK(inum,sb));
+        d = (struct dinode*)bp->data + inum % IPB;
+        if(d->type == 0){
+            memset(d,0,sizeof(*d));
+            d->type = type;
+            return iget(dev,inum);
+        }
+    }
     return 0;
 }
 
+void iupdate(struct inode *ip){
+    struct buf *b = bread(ip->dev,IBLOCK(ip->inum,sb));
+    struct dinode *dip = (struct dinode*)b->data + ip->inum%IPB;
+    dip->type = ip->type;
+    dip->major = ip->major;
+    dip->minor = ip->minor;
+    dip->nlink = ip->nlink;
+    dip->size = ip->size;
+    memmove(dip->addrs, ip->addrs, sizeof(ip->addrs));
+    // TODO : already write to cache buf , now should write to log 
+}
+
+int writei(struct inode *ip,int user_src,uint64 src,uint off, uint n){
+
+    return -1;
+}
+
+int dirlink(struct inode *dp,char *path,short inum){
+    struct dirent dir;
+    
+    int off;
+    for(off = 0; off < dp->size; off += sizeof(dir)){
+        if(readi(dp,0,(uint64)&dir,off,sizeof(dir)) != sizeof(dir)){
+            panic("dirlink panic...\n");
+        }
+        if(dir.inum == 0){
+            break;
+        }
+    }
+
+    strncmp(dir.name,path,DIRSIZ);
+    dir.inum = inum;
+
+    writei(dp,0,(uint64)&dir,off,sizeof(dir));
+    return 0;
+}

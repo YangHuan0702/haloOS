@@ -29,7 +29,7 @@ int consoleread(uint user_dst,uint64 dst,int n){
     int target = n;
     while (n > 0) {
         while (cons.r  == cons.w) {
-            if(myproc()->killed){
+            if(myproc()->killed) {
                 unlock(&cons.slock);
                 return -1;
             }

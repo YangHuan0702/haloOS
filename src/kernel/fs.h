@@ -95,6 +95,8 @@ struct dinode {
   uint size;            // Size of file (bytes)
   uint addrs[NDIRECT+1];   // Data block addresses
 };
+
+
 #define DIRSIZ 14
 
 struct dirent {
@@ -112,5 +114,4 @@ struct dirent {
 #define NDIRECT 12
 #define NINDIRECT (BSIZE / sizeof(uint))
 #define MAXFILE (NDIRECT + NINDIRECT)
-#define 
 

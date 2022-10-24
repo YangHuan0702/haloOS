@@ -1,6 +1,8 @@
 #include "type.h"
 #include "defs.h"
 #include "file.h"
+#include "fcntl.h"
+#include "fs.h"
 
 static int argfd(int n,int *pfd,struct file **fe){
     int fd;
@@ -55,4 +57,52 @@ uint64 sys_dup(){
     return fd;
 }
 
+
+
+
+static struct inode* create(char *path,short type,short major,short minor){
+    struct inode *ip,*dp;
+    dp = iget(ROOTDEV,ROOTINO);
+
+    if(path == '/'){
+        path++;
+    }
+    if((ip = inodeByName(dp,path)) != 0){
+        if(type == T_FILE && (ip->type == T_FILE || ip->type == T_DEVICE)){
+            return ip;
+        }
+    }
+    if((ip = ialloc(dp->dev,type)) == 0){
+        panic("fs.c create >> ialloc panic..\n");
+    }
+    ip->major = major;
+    ip->minor = minor;
+    ip->nlink = 1;
+    iupdate(ip);
+
+    dp->nlink ++;
+    iupdate(dp);
+    
+    if(dirlink(dp,path,ip->inum) < 0){
+        panic("create >> dirline panic...\n");
+    }
+    return ip;
+}
+
+uint64 sys_open(){
+    char path[MAXPATH];
+    int fd,model;
+    int n;
+    if((n = argstr(0,path,MAXPATH)) < 0 || argint(1,&model) < 0){
+        return -1;
+    }
+    
+    struct inode *ip;
+
+    if(model & O_CREATE){
+        // create file
+        ip = create(path,T_FILE,0,0);
+    }
+
+}
 

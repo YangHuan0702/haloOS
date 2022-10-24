@@ -16,7 +16,8 @@
         "spinlock.h": "c",
         "users.h": "c",
         "stdarg.h": "c",
-        "syscall.h": "c"
+        "syscall.h": "c",
+        "fcntl.h": "c"
     },
     "C_Cpp.errorSquiggles": "Disabled"
 }

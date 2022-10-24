@@ -72,6 +72,10 @@ struct inode* iget(uint,uint);
 struct buf* bread(uint,uint);
 int readi(struct inode*,int,uint64,uint,uint);
 struct inode* inodeByName(struct inode*,char*);
+struct inode* create(char*,short,short,short);
+void iupdate(struct inode*);
+struct inode* ialloc(uint,short);
+int dirlink(struct inode*,char*,short);
 
 // print.c
 void printf(char*, ...);
