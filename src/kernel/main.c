@@ -9,7 +9,6 @@ int main(){
     plicinit();
     plicinithart();
     print("OS: Start\n");
-    user_init();
     virtio_disk_init();
     intr_on();
     while(1){

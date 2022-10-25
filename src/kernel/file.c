@@ -30,7 +30,7 @@ struct file* filealloc(){
         }
     }
     unlock(&file.slock);
-    println("filealloc error");
+    return 0;
 }
 
 

@@ -31,10 +31,6 @@ int argstr(int,char*,int);
 int argint(int,int*);
 
 // proc.c
-int get_tasks();
-void user_init();
-void run_target_task_num(int);
-void run_os_task();
 struct cpu* mycpu();
 int cpuid();
 struct proc* myproc();
@@ -76,6 +72,9 @@ struct inode* create(char*,short,short,short);
 void iupdate(struct inode*);
 struct inode* ialloc(uint,short);
 int dirlink(struct inode*,char*,short);
+int writei(struct inode*,int,uint64,uint,uint);
+struct inode* inodeByName(char*);
+
 
 // print.c
 void printf(char*, ...);

@@ -172,6 +172,10 @@ struct inode* iget(uint dev,uint inum){
     return r;
 }
 
+struct inode* inodeByName(char *name){
+    struct inode *dp = iget(ROOTDEV,ROOTINO);
+    return inodeByName(dp,name);
+}
 
 struct inode* inodeByName(struct inode* ip,char* name){
     int off;
@@ -217,8 +221,26 @@ void iupdate(struct inode *ip){
 }
 
 int writei(struct inode *ip,int user_src,uint64 src,uint off, uint n){
-
-    return -1;
+    if(off > ip->size || off + n < off){
+        return -1;
+    }
+    if(off + n > MAXFILE){
+        return -1;
+    }
+    int tot,m;
+    for(tot = 0; tot < n;tot += m,off += m,src += m){
+        struct buf *bp = bread(ip->dev,bmap(ip,off%BSIZE));
+        m = min(n-tot,BSIZE - off % BSIZE);
+        if(either_copy(bp->data+(off%BSIZE),user_src,src,m) != m){
+            break;
+        }
+        // log
+    }
+    if(off > ip->size){
+        ip->size = off;
+    }
+    iupdate(ip);
+    return tot;
 }
 
 int dirlink(struct inode *dp,char *path,short inum){

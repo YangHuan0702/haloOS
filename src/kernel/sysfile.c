@@ -102,7 +102,36 @@ uint64 sys_open(){
     if(model & O_CREATE){
         // create file
         ip = create(path,T_FILE,0,0);
+        if(ip == 0){
+            return -1;
+        }
+    }else{
+        ip = inodeByName(path);
+        if(ip == 0){
+            return -1;
+        }
     }
 
+    if(ip->type = T_DEVICE && (ip->major < 0 || ip->major >= NDEV)){
+        return -1;
+    }
+
+    struct file *f;
+    if((f = filealloc()) == 0 || (fd = fdalloc(f)) < 0){
+        // TODO fs close
+        return -1;
+    }
+
+    if(ip->type == T_DEVICE){
+        f->type = FD_DEVICE;
+        f->major = ip->major;
+    }else{
+       f->type = FD_INODE;
+       f->off = 0;
+    }
+    f->ip = ip;
+    f->readable = !(model & O_WRONLY);
+    f->writable = (model & O_WRONLY) | (model & O_RDWR);
+    return fd;
 }
 
