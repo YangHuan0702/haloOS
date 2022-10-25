@@ -2,24 +2,31 @@
 #include "defs.h"
 #include "riscv.h"
 
+volatile static int started = 0;
+
 int main(){
-    consoleinit();
-    printinit();
-    trapinit();
-    plicinit();
-    plicinithart();
-    print("OS: Start\n");
-    virtio_disk_init();
-    intr_on();
-    while(1){
-        // printf("#: ");
-        // while (getShellResult() == 0) {
-        //     char *cmd = getCmd();
-        //     if(cmd){
-        //         printf("Handler: %s\n",cmd);
-        //     }
-        // }
-        // intr_on();
-    }    
+    if(cpuid() == 0){
+        consoleinit();
+        printinit();
+        trapinit();
+        plicinit();
+        plicinithart();
+        init_bcache();
+        init_inodecache();
+        init_filecache();
+        virtio_disk_init();
+        userinit();
+        __sync_synchronize();
+        print("OS: Start\n");
+        started = 1;
+    }else{
+        while (started == 0) {
+        }
+        __sync_synchronize();
+        trapinit();   
+        plicinithart();
+    }
+    scheduler();
+
     return 0;
 }

@@ -6,6 +6,8 @@
 
 extern void kernelvec();
 
+struct spinlock slock;
+
 void usertrap(){
             
 }
@@ -59,4 +61,5 @@ void kerneltrap(){
 
 void trapinit(){
     w_stvec((uint64)kernelvec);
+    initlock(&slock,"trap");
 }

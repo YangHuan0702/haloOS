@@ -35,6 +35,8 @@ struct cpu* mycpu();
 int cpuid();
 struct proc* myproc();
 int allocpid();
+void scheduler();
+void userinit();
 
 // file.c
 void init_filecache();
@@ -64,6 +66,7 @@ void trapinit();
 void consoleinit();
 
 // fs.c
+struct inode* rooti();
 struct inode* iget(uint,uint);
 struct buf* bread(uint,uint);
 int readi(struct inode*,int,uint64,uint,uint);
@@ -74,7 +77,9 @@ struct inode* ialloc(uint,short);
 int dirlink(struct inode*,char*,short);
 int writei(struct inode*,int,uint64,uint,uint);
 struct inode* inodeByName(char*);
-
+void initfs(int);
+void init_bcache();
+void init_inodecache();
 
 // print.c
 void printf(char*, ...);

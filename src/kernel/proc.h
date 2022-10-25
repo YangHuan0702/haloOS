@@ -1,5 +1,7 @@
 
-#define MAX_TASK 1024
+#define MAX_TASK  1024
+#define NPROC     68
+
 
 struct trapframe {
   /*   0 */ uint64 kernel_satp;   // kernel page table
@@ -71,6 +73,8 @@ struct proc {
   uint pid;
   int killed;
   struct proc *parent;
+
+  uint64 kstack;
 
   struct trapframe *trapframe;
 

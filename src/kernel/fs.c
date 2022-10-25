@@ -10,6 +10,8 @@
 
 struct superblock sb;
 
+struct buf* bread(uint,uint);
+
 struct {
     struct spinlock slock;
     struct buf bufs[NBUF];
@@ -21,12 +23,18 @@ struct {
     struct inode inodes[INODES];
 } inodecache;
 
-void initfs(){
-    readsb();
+static void readsb(int dev,struct superblock *sb){
+    struct buf *f = bread(dev,1);
+    memmove(f->data,sb,sizeof(*sb));
+}
+
+
+void initfs(int dev){
+    readsb(dev,&sb);
     if(sb.magic != FSMAGIC){
         panic("invalid file system");
     }
-    
+    // log init
 }
 
 void init_bcache() {
@@ -170,6 +178,11 @@ struct inode* iget(uint dev,uint inum){
     r->vaild = 0;
     unlock(&inodecache.slock);
     return r;
+}
+
+
+struct inode* rooti(){
+    return iget(ROOTDEV,ROOTINO);
 }
 
 struct inode* inodeByName(char *name){
