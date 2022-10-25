@@ -76,6 +76,8 @@ struct proc {
 
   uint64 kstack;
 
+  void *chan;
+
   struct trapframe *trapframe;
 
   struct context cont;

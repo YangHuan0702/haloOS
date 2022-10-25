@@ -57,9 +57,6 @@ uint64 sys_dup(){
     return fd;
 }
 
-
-
-
 static struct inode* create(char *path,short type,short major,short minor){
     struct inode *ip,*dp;
     dp = iget(ROOTDEV,ROOTINO);
@@ -134,4 +131,3 @@ uint64 sys_open(){
     f->writable = (model & O_WRONLY) | (model & O_RDWR);
     return fd;
 }
-

@@ -16,6 +16,8 @@ void unlock(struct spinlock*);
 void initlock(struct spinlock*,char*);
 void push_off();
 void pop_off();
+int holdinglock(struct spinlock*);
+
 
 // sleeplock.c
 void sleep_lock(struct sleeplock*);
@@ -26,7 +28,7 @@ void sleep_initlock(struct sleeplock*,char*);
 int exec(char*,char**);
 
 // argsuitl.c
-void argaddr(int,uint64*);
+int argaddr(int,uint64*);
 int argstr(int,char*,int);
 int argint(int,int*);
 
@@ -37,6 +39,8 @@ struct proc* myproc();
 int allocpid();
 void scheduler();
 void userinit();
+int wait(uint64);
+void sleep(void*,struct spinlock*)
 
 // file.c
 void init_filecache();

@@ -21,6 +21,11 @@ void unlock(struct spinlock *lock){
 }
 
 
+int holdinglock(struct spinlock *lk){
+    int r = (lk->locked && lk.cpu == mycpu())
+    return r;
+}
+
 void push_off(){
     int intr = intr_get();
     intr_off();

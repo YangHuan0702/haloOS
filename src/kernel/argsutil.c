@@ -15,12 +15,12 @@ static uint64 argptr(int num){
     case 4:
         return proc->trapframe->a4;         
     }
-    panic("argptr panic");
     return -1;
 }
 
-void argaddr(int n,uint64 *addr){
+int argaddr(int n,uint64 *addr){
     *addr = argptr(n);
+    return *addr;
 }
 
 // TODO before need finish to Virtual Memory

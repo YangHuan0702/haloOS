@@ -17,3 +17,13 @@ dup:
     li a7,SYS_DUP
     ecall
     ret
+.global exec
+exec:
+    li a7,SYS_EXEC
+    ecall
+    ret
+.global wait
+    li a7,SYS_WAIT
+    ecall
+    ret
+        

@@ -68,6 +68,88 @@ void forkret(){
 }
 
 
+static void freeproc(struct proc *p){
+	if(p->trapframe){
+		// kfree
+	}
+	p->trapframe = 0;
+	p->pid = 0;
+	p->chan = 0;
+	p->parent = 0;
+	p->name[0] = 0;
+	p->killed = 0;
+	p->state = UNUSED;
+}
+
+
+
+int wait(uint64 p){
+	struct proc *p = myproc();
+	int havekids,pid;
+
+	struct proc *np;
+
+	lock(&wait_lock);
+	for(;;){
+		havekids = 0;
+		for(np = procs; np < procs[NPROC]; np++){
+			if(np->parent == p){
+				lock(&np->slock);
+				havekids = 1;
+				if(np->state == ZOMBIE){
+					pid = np->pid;
+					freeproc(np);
+					unlock(&np->slock);
+					unlock(&wait_lock);
+					return pid;
+				}
+				unlock(&np->slock);
+			}
+		}
+
+		if(!havekids || p->killed){
+			unlock(&wait_lock);	
+			return -1;
+		}
+
+		sleep(p,&wait_lock);
+	}
+}
+
+
+void sched(){
+	struct proc *p = myproc();
+	if(holdinglock(&p->slock)){
+		panic("sched holdinglock \n");
+	}
+	if(p->state = RUNNING){
+		panic("sched p.state is Running \n");
+	}
+	if(intr_get()){
+		panic("sched interruptible");
+	}
+
+	int intena = mycpu()->intena;
+	swtch(&p->cont, &mycpu()->context);
+	mycpu()->intena = intena;
+}
+
+
+void sleep(void *p,struct spinlock *lk){
+	struct proc *myproc = myproc();
+
+	lock(&myproc->slock);
+	unlock(lk);
+	myproc->chan = p;
+	myproc->state = SLEEPING;
+
+	sched();
+
+	myproc->chan = 0;
+	unlock(&myproc->slock);
+	lock(lk);
+}
+
 
 
 void scheduler(){

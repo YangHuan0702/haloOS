@@ -1,5 +1,7 @@
 struct spinlock {
   uint locked;     
 
-  char *name;        
+  char *name;
+
+  struct cpu *cpu; 
 };
