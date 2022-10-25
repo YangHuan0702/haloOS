@@ -40,6 +40,7 @@ src/kernel/%.o: src/kernel/%.c
 
 
 OBJDUMP = riscv64-unknown-elf-objdump
+OBJCOPY = riscv64-unknown-elf-objcopy
 LD = riscv64-unknown-elf-ld
 
 LDFLAGS = -z max-page-size=4096
@@ -51,6 +52,7 @@ _%: %.o
 
 
 
+
 all: os.elf
 
 CPUS = 4
@@ -59,7 +61,13 @@ QEMUOPTS = -machine virt -bios none -kernel src/kernel/kernel -m 128M -smp $(CPU
 QEMUOPTS += -drive file=fs.img,if=none,format=raw,id=x0
 QEMUOPTS += -device virtio-blk-device,drive=x0,bus=virtio-mmio-bus.0
 
-kernel: $(OBJS) src/kernel/os.ld fs.img
+initcode: src/user/initcode.S
+	$(CC) $(CFLAGS) -march=rv64g -nostdinc -I. -Ikernel -c src/user/initcode.S -o src/user/initcode.o
+	$(LD) $(LDFLAGS) -N -e start -Ttext 0 -o src/user/initcode.out src/user/initcode.o
+	$(OBJCOPY) -S -O binary src/user/initcode.out src/user/initcode
+	$(OBJDUMP) -S src/user/initcode.o > src/user/initcode.asm
+
+kernel: $(OBJS) src/kernel/os.ld fs.img initcode
 	$(LD) -z max-page-size=4096 -T src/kernel/os.ld -o src/kernel/kernel $(OBJS)
 	$(OBJDUMP) -S src/kernel/kernel > src/kernel/kernel.asm 
 
