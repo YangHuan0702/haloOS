@@ -1,4 +1,4 @@
-#include "src/kernel/syscall.h"
+#include "../kernel/syscall.h"
 
 .global write
 write:
@@ -26,4 +26,4 @@ exec:
     li a7,SYS_WAIT
     ecall
     ret
-        
+

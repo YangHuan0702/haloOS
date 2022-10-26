@@ -12,8 +12,8 @@ void* memmove(void* dst,void* src,int n){
     if(n == 0){
         return dst;
     }
-    const char *s = src;
-    const char *d = dst;
+    char *s = src;
+    char *d = dst;
 
     if(s < d && s + n > d ){
         s += n;

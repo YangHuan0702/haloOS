@@ -1,8 +1,11 @@
 #include "type.h"
 #include "defs.h"
 #include "file.h"
-#include "fcntl.h"
 #include "fs.h"
+#include "fcntl.h"
+#include "proc.h"
+#include "stat.h"
+
 
 static int argfd(int n,int *pfd,struct file **fe){
     int fd;
@@ -47,7 +50,7 @@ uint64 sys_dup(){
     struct file *f;
     int fd;
 
-    if(argfd(0,0,f) < 0){
+    if(argfd(0,0,&f) < 0){
         return -1;
     }
     if((fd = fdalloc(f)) < 0){
@@ -86,6 +89,10 @@ static struct inode* create(char *path,short type,short major,short minor){
     return ip;
 }
 
+uint64 sys_write(){
+    return 0;
+}
+
 uint64 sys_open(){
     char path[MAXPATH];
     int fd,model;
@@ -103,7 +110,7 @@ uint64 sys_open(){
             return -1;
         }
     }else{
-        ip = inodeByName(path);
+        ip = iname(path);
         if(ip == 0){
             return -1;
         }

@@ -27,7 +27,7 @@ int either_copy(void *dst,int user_src,uint64 src,uint64 len) {
     if(user_src){
         // user -> kernel
     }else{
-        memmove(dst,char*(src),len);
+        memmove(dst,(char*)src,len);
         return 0;
     }
     return -1;

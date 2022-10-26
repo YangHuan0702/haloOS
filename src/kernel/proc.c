@@ -42,27 +42,27 @@ void initproc(){
   	initlock(&wait_lock, "wait_lock");	
 	
 	for(p = procs; p < &procs[NPROC]; p++){
-		initlock(p->slock,"proc");
+		initlock(&p->slock,"proc");
 	}
 }
 
 
 int allocpid(){
 	int pid;
-	lock(&pid_lock);
+	acquire(&pid_lock);
 	pid = nextPid++;
-	unlock(&pid_lock);
+	release(&pid_lock);
 	return pid;
 }
 
 void forkret(){
 	static int firstinit = 1;
 
-	unlock(&myproc()->slock);
+	release(&myproc()->slock);
 
 	if(firstinit){
 		firstinit = 0;
-		fsinit(ROOTDEV);
+		initfs(ROOTDEV);
 	}
 	// TODO
 }
@@ -83,32 +83,32 @@ static void freeproc(struct proc *p){
 
 
 
-int wait(uint64 p){
+int wait(uint64 addr){
 	struct proc *p = myproc();
 	int havekids,pid;
 
 	struct proc *np;
 
-	lock(&wait_lock);
+	acquire(&wait_lock);
 	for(;;){
 		havekids = 0;
-		for(np = procs; np < procs[NPROC]; np++){
+		for(np = procs; np < &procs[NPROC]; np++){
 			if(np->parent == p){
-				lock(&np->slock);
+				acquire(&np->slock);
 				havekids = 1;
 				if(np->state == ZOMBIE){
 					pid = np->pid;
 					freeproc(np);
-					unlock(&np->slock);
-					unlock(&wait_lock);
+					release(&np->slock);
+					release(&wait_lock);
 					return pid;
 				}
-				unlock(&np->slock);
+				release(&np->slock);
 			}
 		}
 
 		if(!havekids || p->killed){
-			unlock(&wait_lock);	
+			release(&wait_lock);	
 			return -1;
 		}
 
@@ -136,18 +136,18 @@ void sched(){
 
 
 void sleep(void *p,struct spinlock *lk){
-	struct proc *myproc = myproc();
+	struct proc *pc = myproc();
 
-	lock(&myproc->slock);
-	unlock(lk);
-	myproc->chan = p;
-	myproc->state = SLEEPING;
+	acquire(&pc->slock);
+	release(lk);
+	pc->chan = p;
+	pc->state = SLEEPING;
 
 	sched();
 
-	myproc->chan = 0;
-	unlock(&myproc->slock);
-	lock(lk);
+	pc->chan = 0;
+	release(&pc->slock);
+	acquire(lk);
 }
 
 
@@ -160,18 +160,21 @@ void scheduler(){
 	for(;;){
 		intr_on();
 		for(p = procs; p < &procs[NPROC];p++){
-			lock(&p->slock);
+			acquire(&p->slock);
 			if(p->state == RUNNABLE){
 				p->state = RUNNING;
-				c.p = p;
+				c->p = p;
 				swtch(&c->context,&p->cont);
 				c->p = 0;
 			}
-			unlock(&p->slock);
+			release(&p->slock);
 		}
 	}
 }
 
+struct proc* allocproc(){
+	return 0;
+}
 
 void userinit(){
 	struct proc *p = allocproc();

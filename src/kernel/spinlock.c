@@ -2,6 +2,8 @@
 #include "defs.h"
 #include "memlayout.h"
 #include "spinlock.h"
+#include "file.h"
+#include "proc.h"
 #include "riscv.h"
 
 extern int atmswap(int *lock);
@@ -12,17 +14,17 @@ void initlock(struct spinlock *lock,char *name){
     lock->locked = 0;
 }
 
-void lock(struct spinlock *lock){
+void acquire(struct spinlock *lock){
     while (atmswap(&lock->locked) != 0){}
 }
 
-void unlock(struct spinlock *lock){
+void release(struct spinlock *lock){
     lock->locked = 0;
 }
 
 
 int holdinglock(struct spinlock *lk){
-    int r = (lk->locked && lk.cpu == mycpu())
+    int r = (lk->locked && lk->cpu == mycpu());
     return r;
 }
 

@@ -59,12 +59,12 @@ void init_inodecache() {
 }
 
 static struct buf* bget(uint dev,uint blockno){
-    struct buf* r
-    lock(&bcache.slock);
+    struct buf *r;
+    acquire(&bcache.slock);
     for(r = bcache.head.next; r != &bcache.head; r = r->next){
-        if(r.dev == dev && r.blockno = blockno){
-            r.refcnt++;
-            unlock(&bcache.slock);
+        if(r->dev == dev && r->blockno == blockno){
+            r->refcnt++;
+            release(&bcache.slock);
             return r;
         }
     }
@@ -74,11 +74,11 @@ static struct buf* bget(uint dev,uint blockno){
             r->vaild = 0;
             r->dev =dev;
             r->blockno = blockno;
-            unlock(&bcache.slock);
+            release(&bcache.slock);
             return r;
         }
     }
-    unlock(&bcache.slock);
+    release(&bcache.slock);
     panic("bget panic..\n");
 }
 
@@ -155,13 +155,13 @@ int readi(struct inode* ip,int user_dst,uint64 dst,uint off,uint n){
 
 
 struct inode* iget(uint dev,uint inum){
-    lock(&inodecache.slock);
+    acquire(&inodecache.slock);
     struct inode* i;
     struct inode* r = 0;
     for(i = &inodecache.inodes[0]; i < &inodecache.inodes[INODES]; i++){
         if(i->ref > 0 && i->dev == dev && i->inum == inum){
             i->ref++;
-            unlock(&inodecache.slock);
+            release(&inodecache.slock);
             return i;
         }
         if(i->ref == 0 && r == 0){
@@ -176,7 +176,7 @@ struct inode* iget(uint dev,uint inum){
     r->inum = inum;
     r->ref = 1;
     r->vaild = 0;
-    unlock(&inodecache.slock);
+    release(&inodecache.slock);
     return r;
 }
 
@@ -185,7 +185,7 @@ struct inode* rooti(){
     return iget(ROOTDEV,ROOTINO);
 }
 
-struct inode* inodeByName(char *name){
+struct inode* iname(char *name){
     struct inode *dp = iget(ROOTDEV,ROOTINO);
     return inodeByName(dp,name);
 }

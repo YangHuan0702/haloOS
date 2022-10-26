@@ -25,9 +25,11 @@
 
 #define NDIRECT 12
 #define NLOG 30
-#define NINODE 14
 #define BITMAPN 1
-#define FSSIZE 1000
+#define FSSIZE 2000
+
+#define MAXOPBLOCKS  10  
+#define LOGSIZE      (MAXOPBLOCKS*3)
 
 
 #define PGSIZE 4096

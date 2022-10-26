@@ -17,7 +17,8 @@
         "users.h": "c",
         "stdarg.h": "c",
         "syscall.h": "c",
-        "fcntl.h": "c"
+        "fcntl.h": "c",
+        "param.h": "c"
     },
     "C_Cpp.errorSquiggles": "Disabled"
 }

@@ -92,7 +92,7 @@ void virt_disk_rw(struct buf *b, int write) {
     // 指定写入的扇区
     uint64 sector = b->blockno * (BSIZE / 512); 
 
-    lock(&disk.disklock);
+    acquire(&disk.disklock);
     int idx[3];
     while (1) {
         if (alloc3_desc(idx) == 0) {
@@ -152,7 +152,7 @@ void virt_disk_rw(struct buf *b, int write) {
     disk.info[idx[0]].b = 0;
     free_chain(idx[0]);
 
-    unlock(&disk.disklock);
+    release(&disk.disklock);
 }
 
 

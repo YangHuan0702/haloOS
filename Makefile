@@ -24,7 +24,16 @@ OBJS = \
 		 src/kernel/virt.o \
 		 src/kernel/util.o \
 		 src/kernel/sleeplock.o \
+		 src/kernel/fs.o \
+		 src/kernel/file.o \
+		 src/kernel/console.o \
+		 src/kernel/exec.o \
 		 src/kernel/spaceswap.o \
+		 src/kernel/syscall.o \
+		 src/kernel/sysfile.o \
+		 src/kernel/sysproc.o \
+		 src/kernel/argsutil.o \
+
 
 USERS = \
 		src/user/_ls\
@@ -45,7 +54,9 @@ LD = riscv64-unknown-elf-ld
 
 LDFLAGS = -z max-page-size=4096
 
-_%: %.o
+ULIB = src/user/sysc.o src/user/printf.o 
+
+_%: %.o $(ULIB)
 	$(LD) $(LDFLAGS) -N -e main -Ttext 0 -o $@ $^
 	$(OBJDUMP) -S $@ > $*.asm
 	$(OBJDUMP) -t $@ | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$$/d' > $*.sym
@@ -70,6 +81,7 @@ initcode: src/user/initcode.S
 kernel: $(OBJS) src/kernel/os.ld fs.img initcode
 	$(LD) -z max-page-size=4096 -T src/kernel/os.ld -o src/kernel/kernel $(OBJS)
 	$(OBJDUMP) -S src/kernel/kernel > src/kernel/kernel.asm 
+	$(OBJDUMP) -t src/kernel/kernel | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$$/d' > src/kernel/kernel.sym
 
 qemu: kernel fs.img
 	$(QEMU) $(QEMUOPTS)
@@ -82,10 +94,6 @@ fs.img:	src/mkfs $(USERS)
 
 #hdd.dsk:
 #	dd if=/dev/urandom of=hdd.dsk bs=1M count=32
-
-QEMUOPTS = -machine virt -bios none -kernel src/kernel/kernel -m 128M -smp 1 -nographic
-
-QEMUOPTS += -drive file=fs.img,if=none,format=raw,id=x0 -device virtio-blk-device,drive=x0,bus=virtio-mmio-bus.0
 #os.elf: src/start.S src/kernel/swtch.S src/main.c $(OBJS)
 #	$(CC) $(CFLAGS) -T src/os.ld -o os.elf $^
 

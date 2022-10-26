@@ -1,11 +1,12 @@
 #include "type.h"
 #include "defs.h"
 #include "file.h"
+#include "spinlock.h"
 #include "proc.h"
 #include "elf.h"
 
 int exec(char *path,char** argv){
-    struct inode *node = getInodeByDevAndINum(ROOTDEV,ROOTINO);
+    struct inode *node = rooti();
     path+=1;
     struct inode *app = inodeByName(node,path);
     if(app == 0){

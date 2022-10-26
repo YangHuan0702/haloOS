@@ -3,14 +3,19 @@
 #include <unistd.h>
 #include <string.h>
 #include <fcntl.h>
+#include <assert.h>
 
+#define stat xv6_stat
 #include "kernel/fs.h"
 #include "kernel/file.h"
 #include "kernel/stat.h"
 
-int nlog = NLOG;
-int nInode = NINODE;
-int bitmapn = BITMAPN;
+#define NINODES 200
+
+int nlog = LOGSIZE;
+int nInode = NINODES / IPB + 1;
+int bitmapn = FSSIZE/(BSIZE*8) + 1;
+int ninodeblocks = NINODES / IPB + 1;
 int nmeta;
 int nblocks;
 int freeBlock;
@@ -32,8 +37,6 @@ uint xint(uint x){
     return y;
 }
 
-
-
 ushort xshort(ushort x){
     ushort y;
     uchar *a = (uchar*)&y;
@@ -54,7 +57,7 @@ void wsect(int sect,void *buf){
     }
 }
 
-void rsect(int sect,void *buf){
+void rsect(uint sect,void *buf){
     if(lseek(fsfd,sect * BSIZE,SEEK_SET) != sect * BSIZE){
         printf("rsect lseek die \n");
         exit(1);
@@ -72,8 +75,9 @@ void winode(uint inum,struct dinode *din){
     rsect(bn,buf);
     dip = ((struct dinode*)buf) + (inum % IPB);
     *dip = *din;
-    wsect(bn,dip);
+    wsect(bn,buf);
 }
+
 
 void rinode(uint inum,struct dinode *ip){
     char buf[BSIZE];
@@ -81,6 +85,7 @@ void rinode(uint inum,struct dinode *ip){
     uint bn = IBLOCK(inum,sb);
     rsect(bn,buf);
     dip = ((struct dinode*)buf) + (inum % IPB);
+    printf("rinode inum:%d, size : %d\n",inum,dip->size);
     *ip = *dip;
 }
 
@@ -105,12 +110,10 @@ void iappend(uint inum,void *xp,int n){
     char buf[BSIZE];
     uint fbn,off,x,n1;
     off = xint(d.size);
+    printf("append inum %d at off %d sz %d oldsize:%d\n", inum, off, n,d.size);
     while (n > 0) {
         fbn = off / BSIZE;
-        if(fbn > MAXFILE){
-            printf("fbn > MaxFile \n");
-            exit(1);
-        }
+        assert(fbn < MAXFILE);
         if(fbn < NDIRECT){
             if(xint(d.addrs[fbn]) == 0){
                 d.addrs[fbn] = xint(freeBlock++);
@@ -135,6 +138,7 @@ void iappend(uint inum,void *xp,int n){
         off += n1;
         c += n1;
     }
+    printf("d->size :%d\n",off);
     d.size = xint(off);
     winode(inum,&d);
 }
@@ -148,7 +152,7 @@ void balloc(int used){
     }
     bzero(buf,BSIZE);
     for(int i = 0;i < used;i++){
-        buf[i / 8] = buf[i / 8] | (1 << (i%8));
+        buf[i / 8] = buf[i / 8] | (0x1 << (i%8));
     }
     wsect(sb.bmapstart,buf);
 }
@@ -172,20 +176,21 @@ int main(int argc,char *argv[]){
     }    
 
     printf(argv[1]);
+    printf("\n");
 
     nmeta = 2 + nlog + nInode + bitmapn;
     nblocks = FSSIZE - nmeta;
-
+   
     sb.magic = FSMAGIC;
     sb.size = xint(FSSIZE);
     sb.nblocks = xint(nblocks);
-    sb.ninodes = xint(nInode);
+    sb.ninodes = xint(NINODES);
     sb.nlog = xint(nlog);
     sb.logstart = xint(2);
-    sb.inodestart = xint(2 + nlog);
-    sb.bmapstart = xint(2+nlog+nInode);
-    sb.dataStart = xint(2 + nlog + nblocks + 1);
-
+    sb.inodestart = xint(2+nlog);
+    sb.bmapstart = xint(2+nlog+ninodeblocks);
+    printf("nmeta %d (boot, super, log blocks %u inode blocks %u, bitmap blocks %u) blocks %d total %d\n",
+         nmeta, nlog, ninodeblocks, bitmapn, nblocks, FSSIZE);
     freeBlock = nmeta;
 
     for(int i = 0; i< FSSIZE; i++){
@@ -199,10 +204,7 @@ int main(int argc,char *argv[]){
     wsect(1,buf);
 
     uint rootinode = ialloc(T_DIR);
-    if(rootinode != ROOTINO){
-        printf("ialloc rootinode != ROOTINO(1)\n");
-        exit(1);
-    }
+    assert(rootinode == ROOTINO);
 
     struct dirent de;
     bzero(&de,sizeof(de));    
@@ -217,16 +219,13 @@ int main(int argc,char *argv[]){
 
     int fd,inum,cc;
     for(int i = 2;i < argc;i++){
+        printf("<><><><><<>><><><>\n");
         char *shortname;
         if(strncmp(argv[i],"src/user/",9) == 0){
             shortname = argv[i] + 9;
         }else{
             shortname = argv[i];
         }
-
-        printf("++++++++++\n");
-        printf(shortname);
-
         // if(index(shortname,'/') == 0){
         //     printf("shortname start / \n");
         //     exit(1);
@@ -242,9 +241,11 @@ int main(int argc,char *argv[]){
         }
 
         inum = ialloc(T_FILE);
+
         bzero(&de, sizeof(de));
         de.inum = xshort(inum);
         strncpy(de.name,shortname,DIRSIZ);
+        printf("fullname:%s,name: %s,size: %ld\n",argv[i],shortname,sizeof(de));
         iappend(rootinode,&de,sizeof(de));
 
         while((cc = read(fd,buf,sizeof(buf)))  > 0){

@@ -11,8 +11,8 @@ struct proc;
 void swtch(struct context*, struct context*);
 
 // spinlock.c
-void lock(struct spinlock*);
-void unlock(struct spinlock*);
+void acquire(struct spinlock*);
+void release(struct spinlock*);
 void initlock(struct spinlock*,char*);
 void push_off();
 void pop_off();
@@ -40,7 +40,7 @@ int allocpid();
 void scheduler();
 void userinit();
 int wait(uint64);
-void sleep(void*,struct spinlock*)
+void sleep(void*,struct spinlock*);
 
 // file.c
 void init_filecache();
@@ -75,12 +75,11 @@ struct inode* iget(uint,uint);
 struct buf* bread(uint,uint);
 int readi(struct inode*,int,uint64,uint,uint);
 struct inode* inodeByName(struct inode*,char*);
-struct inode* create(char*,short,short,short);
 void iupdate(struct inode*);
 struct inode* ialloc(uint,short);
 int dirlink(struct inode*,char*,short);
 int writei(struct inode*,int,uint64,uint,uint);
-struct inode* inodeByName(char*);
+struct inode* iname(char*);
 void initfs(int);
 void init_bcache();
 void init_inodecache();
@@ -99,7 +98,7 @@ void virt_disk_rw(struct buf*,int);
 void virtio_disk_isr();
 
 // spaceswap.c
-void* copyout(void*,void*,int);
+uint copyout(int,uint64,void*,int);
 int either_copy(void*,int,uint64,uint64);
 int either_copyout(int,uint64,void*,uint64);
 
@@ -108,3 +107,5 @@ int either_copyout(int,uint64,void*,uint64);
 char* memset(void*,int,int);
 void* memmove(void*,void*,int);
 int strncmp(const char*,const char*,int);
+
+#define NELEM(x) (sizeof(x)/sizeof((x)[0]))

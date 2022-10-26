@@ -11,12 +11,12 @@ void sleep_initlock(struct sleeplock* sl,char* name){
 }
 
 void sleep_lock(struct sleeplock *sl){
-    lock(&sl->splock);
+    acquire(&sl->splock);
     while (sl->locked) {
         // sleep();
     }
     sl->locked = 1;
-    unlock(&sl->splock);
+    release(&sl->splock);
 }
 
 void sleep_unlock(struct sleeplock *sl){

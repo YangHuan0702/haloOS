@@ -1,6 +1,7 @@
 #include "type.h"
 #include "defs.h"
 #include "riscv.h"
+#include "spinlock.h"
 #include "memlayout.h"
 
 

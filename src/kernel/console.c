@@ -1,6 +1,8 @@
 #include "type.h"
 #include "defs.h"
 #include "file.h"
+#include "spinlock.h"
+#include "proc.h"
 
 #define C(x)  ((x)-'@')  // Control-x
 #define INPUT_MAX 128
@@ -11,7 +13,7 @@ struct {
     uint w;
 } cons;
 
-int consolewrite(uint user_dst,uint64 src,int n){
+int consolewrite(int user_dst,uint64 src,int n){
     int i;
     for(i = 0; i< n;i++){
         char c;
@@ -23,14 +25,14 @@ int consolewrite(uint user_dst,uint64 src,int n){
     return i;
 }
 
-int consoleread(uint user_dst,uint64 dst,int n){
-    lock(&cons.slock);
+int consoleread(int user_dst,uint64 dst,int n){
+    acquire(&cons.slock);
 
     int target = n;
     while (n > 0) {
-        while (cons.r  == cons.w) {
+        while (cons.r == cons.w) {
             if(myproc()->killed) {
-                unlock(&cons.slock);
+                release(&cons.slock);
                 return -1;
             }
             // sleep(&cons.r, &cons.slock);
@@ -55,7 +57,7 @@ int consoleread(uint user_dst,uint64 dst,int n){
             break;
         }
     }
-    unlock(&cons.slock);
+    release(&cons.slock);
     return target - n;
 }
 

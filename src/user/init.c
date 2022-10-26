@@ -1,7 +1,7 @@
 #include "src/kernel/type.h"
 #include "src/kernel/stat.h"
 #include "src/kernel/fcntl.h"
-#include "user/users.h"
+#include "src/user/users.h"
 
 
 int main(){

@@ -1,5 +1,6 @@
 #include "type.h"
 #include "memlayout.h"
+#include "spinlock.h"
 #include "defs.h"
 #include <stdarg.h>
 
@@ -11,7 +12,7 @@ static struct {
     int locking;
 } pr;
 
-static volatile int panicked = 0;
+volatile int panicked = 0;
 
 void printinit(){
     uartinit();
@@ -66,7 +67,7 @@ void printf(char *s, ...){
         return;
     }
     if(pr.locking){
-        lock(&pr.slock);
+        acquire(&pr.slock);
     }
     va_list ap;
     va_start(ap,s);
@@ -101,7 +102,7 @@ void printf(char *s, ...){
         }
     }    
     if(pr.locking){
-        unlock(&pr.slock);
+        release(&pr.slock);
     }
 }
 

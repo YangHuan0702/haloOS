@@ -1,8 +1,11 @@
 #include "type.h"
 #include "defs.h"
+#include "file.h"
+#include "fs.h"
+#include "proc.h"
 
 static uint64 argptr(int num){
-    struct proc *proc = mycpu();
+    struct proc *proc = myproc();
     switch (num) {
     case 0:
         return proc->trapframe->a0;

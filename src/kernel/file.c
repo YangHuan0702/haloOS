@@ -21,26 +21,27 @@ void init_filecache(){
 }
 
 struct file* filealloc(){
-    lock(&file.slock);
-    for(int i = 0; i < NFILE;i++){
-        struct file f = files[i];
-        if(f.ref == 0){
-            unlock(&file.slock);
-            return &f;
+    struct file *f;
+    acquire(&filecache.slock);
+    for(f = filecache.files; f < filecache.files + NFILE; f++){
+        if(f->ref == 0){
+        f->ref = 1;
+        release(&filecache.slock);
+        return f;
         }
     }
-    unlock(&file.slock);
+    release(&filecache.slock);
     return 0;
 }
 
 
 struct  file* filedup(struct file* f){
-    lock(&filecache.slock);
+    acquire(&filecache.slock);
     if(f->ref < 1){
         panic("filedup | target file ref < 1..");
     }
     f->ref++;
-    unlock(&filecache.slock);
+    release(&filecache.slock);
     return f;
 } 
 
