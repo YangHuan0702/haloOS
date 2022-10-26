@@ -112,3 +112,4 @@ gdb: src/kernel/kernel
 clean:
 	rm -f *.elf src/kernel/*.o src/kernel/kernel src/kernel/kernel.asm
 	rm -f src/user/*.o src/user/*.sym src/user/*.asm $(USERS)
+	rm -rf src/user/initcode src/user/*.out

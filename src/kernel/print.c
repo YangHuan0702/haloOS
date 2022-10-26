@@ -60,7 +60,15 @@ void printP(uint64 ptr){
     }
 }
 
-
+void print(char *s){
+    if(pr.locking){
+        acquire(&pr.slock);
+    }
+    uart_putstr(s);
+     if(pr.locking){
+        release(&pr.slock);
+    }
+}
 
 void printf(char *s, ...){
     if(s == 0){
@@ -107,9 +115,6 @@ void printf(char *s, ...){
 }
 
 
-void print(char *s){
-    uart_putstr(s);
-}
 
 void println(char *s){
     char *nextLine = "\n";

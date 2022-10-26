@@ -57,7 +57,7 @@ int allocpid(){
 
 void forkret(){
 	static int firstinit = 1;
-
+	panic("join forkret\n");
 	release(&myproc()->slock);
 
 	if(firstinit){
@@ -172,16 +172,34 @@ void scheduler(){
 	}
 }
 
-struct proc* allocproc(){
+static struct proc* allocproc(){
+	struct proc *p;
+
+	for(p = procs; p < &procs[NPROC]; p++){
+		acquire(&p->slock);
+		if(p->state == UNUSED){
+			goto found;
+		}
+		release(&p->slock);	
+	}
 	return 0;
+
+found:
+	p->pid = allocpid();
+	p->state = USED;
+
+	memset(&p->cont,0,sizeof(p->cont));
+	p->cont.ra = (uint64) forkret;
+	release(&p->slock);	
+	return p;
 }
 
 void userinit(){
 	struct proc *p = allocproc();
 	initp = p;
-
-	p->trapframe->epc = 0;
-	p->trapframe->sp = PGSIZE;
+	printf("first proc ra is: %p\n",p->cont.ra);
+	// p->trapframe->epc = 0;
+	// p->trapframe->sp = PGSIZE;
 	strncmp(p->name,"initcode",sizeof(p->name));
 	p->pwd = rooti();
 	p->state = RUNNABLE;

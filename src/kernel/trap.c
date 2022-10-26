@@ -53,7 +53,8 @@ void kerneltrap(){
         // printf("timer switch num:%d\n",task_num);
         // run_target_task_num(task_num);
     }else{
-        printf("sepc=%p stval=%p\n", r_sepc(), r_stval());
+        printf("sepc=%p stval=%p\n scause=%d\n", r_sepc(), r_stval(),r_scause());
+        panic("kernel trap\n");
     }
     
     w_sepc(sepc);

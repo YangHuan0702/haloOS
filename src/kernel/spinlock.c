@@ -14,19 +14,34 @@ void initlock(struct spinlock *lock,char *name){
     lock->locked = 0;
 }
 
-void acquire(struct spinlock *lock){
-    while (atmswap(&lock->locked) != 0){}
-}
-
-void release(struct spinlock *lock){
-    lock->locked = 0;
-}
-
-
 int holdinglock(struct spinlock *lk){
     int r = (lk->locked && lk->cpu == mycpu());
     return r;
 }
+
+void acquire(struct spinlock *lock){
+    push_off();
+    if(holdinglock(lock)){
+        panic("acquire...\n");
+    }
+    while (atmswap(&lock->locked) != 0){}
+    __sync_synchronize();
+    lock->cpu = mycpu();
+}
+
+
+
+void release(struct spinlock *lock){
+    if(!holdinglock(lock)){
+        panic("release...\n");
+    }
+    lock->cpu = 0;
+    __sync_synchronize();
+    lock->locked = 0;
+    pop_off();
+}
+
+
 
 void push_off(){
     int intr = intr_get();
