@@ -61,13 +61,7 @@ void printP(uint64 ptr){
 }
 
 void print(char *s){
-    if(pr.locking){
-        acquire(&pr.slock);
-    }
     uart_putstr(s);
-     if(pr.locking){
-        release(&pr.slock);
-    }
 }
 
 void printf(char *s, ...){

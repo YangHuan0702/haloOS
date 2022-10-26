@@ -43,6 +43,7 @@ void initproc(){
 	
 	for(p = procs; p < &procs[NPROC]; p++){
 		initlock(&p->slock,"proc");
+		p->kstack = KSTACK((int) (p - procs));
 	}
 }
 
@@ -164,6 +165,7 @@ void scheduler(){
 			if(p->state == RUNNABLE){
 				p->state = RUNNING;
 				c->p = p;
+				printf("swtch proc name:%s ra:%p\n",p->name,p->cont.ra);
 				swtch(&c->context,&p->cont);
 				c->p = 0;
 			}
@@ -190,7 +192,7 @@ found:
 
 	memset(&p->cont,0,sizeof(p->cont));
 	p->cont.ra = (uint64) forkret;
-	release(&p->slock);	
+	p->cont.sp = p->kstack + PGSIZE;
 	return p;
 }
 
@@ -200,7 +202,8 @@ void userinit(){
 	printf("first proc ra is: %p\n",p->cont.ra);
 	// p->trapframe->epc = 0;
 	// p->trapframe->sp = PGSIZE;
-	strncmp(p->name,"initcode",sizeof(p->name));
+	safestrcpy(p->name,"initcode",sizeof(p->name));
 	p->pwd = rooti();
 	p->state = RUNNABLE;
+	release(&p->slock);	
 }

@@ -41,7 +41,7 @@ void scheduler();
 void userinit();
 int wait(uint64);
 void sleep(void*,struct spinlock*);
-
+void initproc();
 // file.c
 void init_filecache();
 struct file* filealloc();
@@ -107,5 +107,6 @@ int either_copyout(int,uint64,void*,uint64);
 char* memset(void*,int,int);
 void* memmove(void*,void*,int);
 int strncmp(const char*,const char*,int);
+char* safestrcpy(char*,const char*,int);
 
 #define NELEM(x) (sizeof(x)/sizeof((x)[0]))

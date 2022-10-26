@@ -32,3 +32,15 @@ int either_copy(void *dst,int user_src,uint64 src,uint64 len) {
     }
     return -1;
 }
+
+char* safestrcpy(char *s, const char *t, int n) {
+  char *os;
+
+  os = s;
+  if(n <= 0)
+    return os;
+  while(--n > 0 && (*s++ = *t++) != 0)
+    ;
+  *s = 0;
+  return os;
+}
