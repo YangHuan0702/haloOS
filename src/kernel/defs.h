@@ -46,6 +46,7 @@ void initproc();
 void init_filecache();
 struct file* filealloc();
 struct file* filedup(struct file*);
+void forkret();
 
 
 // memlayout.c

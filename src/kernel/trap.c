@@ -43,7 +43,7 @@ void kerneltrap(){
         }
     }else if(scause == 0x8000000000000001){
         w_sip(r_sip() & ~2);
-        printf("ttt");
+        printf("ttt\n");
         // timer_processed_count++;
         // int current_tasks = get_tasks();
         // if(0 == current_tasks){

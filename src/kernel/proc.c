@@ -13,6 +13,8 @@ struct proc procs[NPROC];
 
 struct proc *initp;
 
+extern void forkret(void);
+
 struct spinlock pid_lock;
 struct spinlock wait_lock;
 volatile int nextPid = 1;
@@ -54,18 +56,6 @@ int allocpid(){
 	pid = nextPid++;
 	release(&pid_lock);
 	return pid;
-}
-
-void forkret(){
-	static int firstinit = 1;
-	panic("join forkret\n");
-	release(&myproc()->slock);
-
-	if(firstinit){
-		firstinit = 0;
-		initfs(ROOTDEV);
-	}
-	// TODO
 }
 
 
@@ -156,7 +146,6 @@ void sleep(void *p,struct spinlock *lk){
 void scheduler(){
 	struct proc *p;
 	struct cpu *c = mycpu();
-
 	c->p = 0;
 	for(;;){
 		intr_on();
@@ -165,7 +154,7 @@ void scheduler(){
 			if(p->state == RUNNABLE){
 				p->state = RUNNING;
 				c->p = p;
-				printf("swtch proc name:%s ra:%p\n",p->name,p->cont.ra);
+				printf("swtch proc name:%s ra:%p ,sp:%p , s0:%d , s11:%d\n",p->name,p->cont.ra,p->cont.sp,p->cont.s0,p->cont.s11);
 				swtch(&c->context,&p->cont);
 				c->p = 0;
 			}
@@ -206,4 +195,18 @@ void userinit(){
 	p->pwd = rooti();
 	p->state = RUNNABLE;
 	release(&p->slock);	
+}
+
+
+void forkret(void){
+	printf("---------");
+	static int firstinit = 1;
+	panic("join forkret\n");
+	release(&myproc()->slock);
+
+	if(firstinit){
+		firstinit = 0;
+		initfs(ROOTDEV);
+	}
+	// TODO
 }
