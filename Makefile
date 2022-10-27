@@ -47,6 +47,14 @@ USERS = \
 src/kernel/%.o: src/kernel/%.c
 	$(CC) $(CFLAGS) -c -o $@ $<
 
+GDBPORT = $(shell expr `id -u` % 5000 + 25000)
+
+.gdbinit: .gdbinit.tmpl-riscv
+	sed "s/:1234/:$(GDBPORT)/" < $^ > $@
+
+qemu-gdb: src/kernel/kernel .gdbinit fs.img
+	@echo "*** Now run 'gdb' in another window." 1>&2
+	$(QEMU) $(QEMUOPTS) -S $(QEMUGDB)
 
 OBJDUMP = riscv64-unknown-elf-objdump
 OBJCOPY = riscv64-unknown-elf-objcopy
@@ -110,6 +118,6 @@ gdb: src/kernel/kernel
 # 	$(QEMU) $(QFLAGS) -kernel src/kernel/kernel
 
 clean:
-	rm -f *.elf src/kernel/*.o src/kernel/kernel src/kernel/kernel.asm
+	rm -f *.elf src/kernel/*.o src/kernel/kernel src/kernel/kernel.asm src/kernel/kernel.sym
 	rm -f src/user/*.o src/user/*.sym src/user/*.asm $(USERS)
 	rm -rf src/user/initcode src/user/*.out
