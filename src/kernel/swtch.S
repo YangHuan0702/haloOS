@@ -1,4 +1,4 @@
-.global swtch
+.globl swtch
 swtch:
         sd ra, 0(a0)
         sd sp, 8(a0)
@@ -29,4 +29,7 @@ swtch:
         ld s9, 88(a1)
         ld s10, 96(a1)
         ld s11, 104(a1)
+        
         ret
+
+	
