@@ -64,7 +64,7 @@ static struct inode* create(char *path,short type,short major,short minor){
     struct inode *ip,*dp;
     dp = iget(ROOTDEV,ROOTINO);
 
-    if(path == '/'){
+    if(*path == '/'){
         path++;
     }
     if((ip = inodeByName(dp,path)) != 0){
@@ -116,7 +116,7 @@ uint64 sys_open(){
         }
     }
 
-    if(ip->type = T_DEVICE && (ip->major < 0 || ip->major >= NDEV)){
+    if(ip->type == T_DEVICE && (ip->major < 0 || ip->major >= NDEV)){
         return -1;
     }
 

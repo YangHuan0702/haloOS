@@ -12,7 +12,7 @@ uint copyout(int user_dst,uint64 dst,void *src,int n){
 }
 
 int either_copyout(int user_dst,uint64 dst,void *src,uint64 len){
-    struct proc *p = myproc();
+    // struct proc *p = myproc();
     if(user_dst){
         // kernel -> user
     }else{
@@ -23,7 +23,7 @@ int either_copyout(int user_dst,uint64 dst,void *src,uint64 len){
 }
 
 int either_copy(void *dst,int user_src,uint64 src,uint64 len) {
-    struct proc *proc  = myproc();
+    // struct proc *proc  = myproc();
     if(user_src){
         // user -> kernel
     }else{

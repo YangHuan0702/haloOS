@@ -1,6 +1,7 @@
 CC = riscv64-unknown-elf-gcc
 #CFLAGS = -nostdlib -fno-builtin -mcmodel=medany -march=rv32ima -mabi=ilp32
-CFLAGS = -nostdlib -fno-builtin -mcmodel=medany -march=rv64g -fno-common -ffreestanding
+CFLAGS = -Wall -Werror -O -fno-omit-frame-pointer -ggdb
+CFLAGS += -nostdlib -fno-builtin -mcmodel=medany -march=rv64g -fno-common -ffreestanding
 
 QEMU = qemu-system-riscv64
 QFLAGS = -nographic -smp 4 -m 128M -machine virt -bios none
@@ -14,8 +15,8 @@ OBJS = \
 		 src/kernel/kernelvec.o \
 		 src/kernel/main.o \
 		 src/kernel/print.o \
-		 src/kernel/proc.o \
 		 src/kernel/swtch.o \
+		 src/kernel/proc.o \
 		 src/kernel/memlayout.o \
 		 src/kernel/trap.o \
 		 src/kernel/spinlock.o \
@@ -48,6 +49,9 @@ src/kernel/%.o: src/kernel/%.c
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 GDBPORT = $(shell expr `id -u` % 5000 + 25000)
+QEMUGDB = $(shell if $(QEMU) -help | grep -q '^-gdb'; \
+	then echo "-gdb tcp::$(GDBPORT)"; \
+	else echo "-s -p $(GDBPORT)"; fi)
 
 .gdbinit: .gdbinit.tmpl-riscv
 	sed "s/:1234/:$(GDBPORT)/" < $^ > $@
@@ -106,7 +110,7 @@ fs.img:	src/mkfs $(USERS)
 #	$(CC) $(CFLAGS) -T src/os.ld -o os.elf $^
 
 gdb: src/kernel/kernel
-	$(QEMU) $(QEMUOPTS) -S -gdb tcp::25000
+	riscv64-unknown-elf-gdb src/kernel/kernel
 
 # fs
 #QFLAGS += -drive if=none,format=raw,file=hdd.dsk,id=x0

@@ -6,7 +6,7 @@
 
 static char nums[] = "0123456789abcdef";
 
-putc(int fd, char c)
+void putc(int fd, char c)
 {
   write(fd, &c, 1);
 }
@@ -25,7 +25,7 @@ static void printInt(int val,int u){
 
 void print(char *s){
     while (*s) {
-        putc(1,s++);
+        putc(1,*(s++));
     }
 }
 
@@ -36,7 +36,7 @@ static void printPtr(uint64 ptr){
     putc(1,'x');
     
     for(int i = 0; i < (sizeof(uint64) * 2); i++,ptr <<= 4){
-        putc(1,nums[ptr >> sizeof(uint64) * 8 - 4]);
+        putc(1,nums[ptr >> (sizeof(uint64) * 8 - 4)]);
     }
 }
 

@@ -113,7 +113,7 @@ void sched(){
 	if(holdinglock(&p->slock)){
 		panic("sched holdinglock \n");
 	}
-	if(p->state = RUNNING){
+	if(p->state == RUNNING){
 		panic("sched p.state is Running \n");
 	}
 	if(intr_get()){

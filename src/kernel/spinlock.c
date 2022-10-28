@@ -6,7 +6,7 @@
 #include "proc.h"
 #include "riscv.h"
 
-extern int atmswap(int *lock);
+extern int atmswap(uint *lock);
 
 
 void initlock(struct spinlock *lock,char *name){

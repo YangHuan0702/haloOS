@@ -40,7 +40,7 @@ static void printPtr(uint64 ptr){
     uart_putc('x');
     
     for(int i = 0; i < (sizeof(uint64) * 2); i++,ptr <<= 4){
-        uart_putc(nums[ptr >> sizeof(uint64) * 8 - 4]);
+        uart_putc(nums[ptr >> (sizeof(uint64) * 8 - 4)]);
     }
 }
 
@@ -51,6 +51,7 @@ void printP(uint64 ptr){
     char buff[32];    
     
     int a,i;
+    i = 0;
     do {
         a = ptr % 16;
         buff[i++] = nums[a];

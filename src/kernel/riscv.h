@@ -151,9 +151,10 @@ static inline uint64 r_mstatus(){
     return x;    
 }
 
-static inline uint64 w_mie(uint64 x){
+static inline void w_mie(uint64 x){
     asm volatile("csrw mie,%0" :: "r"(x));
 }
+
 static inline uint64 r_mie(){
     uint64 x;
     asm volatile("csrr %0,mie" : "=r"(x));

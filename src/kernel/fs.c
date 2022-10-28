@@ -80,6 +80,7 @@ static struct buf* bget(uint dev,uint blockno){
     }
     release(&bcache.slock);
     panic("bget panic..\n");
+    return 0;
 }
 
 
@@ -130,6 +131,7 @@ static uint bmap(struct inode* ip,uint n){
         return addr;
     }
     panic("bmap panic...\n");
+    return 0;
 }
 
 
