@@ -6,6 +6,8 @@
 int main();
 void timer_init();
 
+__attribute__ ((aligned (16))) char stack0[4096 * NCPU];
+
 uint64 timer_scratch[NCPU][5];
 
 extern void timervec();

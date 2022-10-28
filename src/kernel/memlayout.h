@@ -76,4 +76,4 @@
 #define CLINT 0x2000000
 #define CLINT_MTIMECMP(hartid) (CLINT + 0x4000 + 8*(hartid))
 #define CLINT_MTIME (CLINT + 0xBFF8)
-#define INTERVAL 10000000 // 大约是100 ms (xv6)
+#define INTERVAL 1000000 // 大约是100 ms (xv6)

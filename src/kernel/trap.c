@@ -16,7 +16,7 @@ void usertrap(){
 static volatile int timer_processed_count = 0;
 
 void kerneltrap(){
-    printf("-------trap-------\n");
+    printf("sepc=%p stval=%p\n scause=%d\n", r_sepc(), r_stval(),r_scause());
     // 判断是否是软件中断
     uint64 sstatus = r_sstatus();
     uint64 scause = r_scause();

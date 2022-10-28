@@ -13,11 +13,25 @@ struct proc procs[NPROC];
 
 struct proc *initp;
 
-extern void forkret(void);
+extern void forkret();
 
 struct spinlock pid_lock;
 struct spinlock wait_lock;
 volatile int nextPid = 1;
+
+
+void forkret(){
+	printf("---------");
+	static int firstinit = 1;
+	panic("join forkret\n");
+	release(&myproc()->slock);
+
+	if(firstinit){
+		firstinit = 0;
+		initfs(ROOTDEV);
+	}
+	// TODO
+}
 
 int cpuid(){
 	int cpuid = r_tp();
@@ -48,7 +62,6 @@ void initproc(){
 		p->kstack = KSTACK((int) (p - procs));
 	}
 }
-
 
 int allocpid(){
 	int pid;
@@ -141,14 +154,12 @@ void sleep(void *p,struct spinlock *lk){
 	acquire(lk);
 }
 
-
-
 void scheduler(){
 	struct proc *p;
 	struct cpu *c = mycpu();
 	c->p = 0;
 	for(;;){
-		intr_on();
+		// intr_on();
 		for(p = procs; p < &procs[NPROC];p++){
 			acquire(&p->slock);
 			if(p->state == RUNNABLE){
@@ -169,20 +180,16 @@ static struct proc* allocproc(){
 	for(p = procs; p < &procs[NPROC]; p++){
 		acquire(&p->slock);
 		if(p->state == UNUSED){
-			goto found;
+			p->pid = allocpid();
+			p->state = USED;
+			memset(&p->cont,0,sizeof(p->cont));
+			p->cont.ra = (uint64) forkret;
+			p->cont.sp = p->kstack + PGSIZE;
+			return p;
 		}
 		release(&p->slock);	
 	}
 	return 0;
-
-found:
-	p->pid = allocpid();
-	p->state = USED;
-
-	memset(&p->cont,0,sizeof(p->cont));
-	p->cont.ra = (uint64) forkret;
-	p->cont.sp = p->kstack + PGSIZE;
-	return p;
 }
 
 void userinit(){
@@ -198,15 +205,3 @@ void userinit(){
 }
 
 
-void forkret(void){
-	printf("---------");
-	static int firstinit = 1;
-	panic("join forkret\n");
-	release(&myproc()->slock);
-
-	if(firstinit){
-		firstinit = 0;
-		initfs(ROOTDEV);
-	}
-	// TODO
-}
