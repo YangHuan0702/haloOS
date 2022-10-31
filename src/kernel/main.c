@@ -11,6 +11,8 @@ int main(){
         trapinit();
         plicinit();
         plicinithart();
+        kinit();
+        kvminit();
         initproc();
         init_bcache();
         init_inodecache();

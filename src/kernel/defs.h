@@ -108,4 +108,12 @@ void* memmove(void*,void*,int);
 int strncmp(const char*,const char*,int);
 char* safestrcpy(char*,const char*,int);
 
+
+// vm.c
+void kfree(void*);
+void freerange(void*,void*);
+void kinit();
+void* kalloc();
+void kvminit();
+
 #define NELEM(x) (sizeof(x)/sizeof((x)[0]))
