@@ -2,6 +2,7 @@ CC = riscv64-unknown-elf-gcc
 #CFLAGS = -nostdlib -fno-builtin -mcmodel=medany -march=rv32ima -mabi=ilp32
 CFLAGS = -Wall -Werror -O -fno-omit-frame-pointer -ggdb
 CFLAGS += -nostdlib -fno-builtin -mcmodel=medany -march=rv64g -fno-common -ffreestanding
+CFLAGS += $(shell $(CC) -fno-stack-protector -E -x c /dev/null >/dev/null 2>&1 && echo -fno-stack-protector)
 
 QEMU = qemu-system-riscv64
 QFLAGS = -nographic -smp 4 -m 128M -machine virt -bios none
@@ -34,16 +35,19 @@ OBJS = \
 		 src/kernel/sysfile.o \
 		 src/kernel/sysproc.o \
 		 src/kernel/argsutil.o \
+		 src/kernel/trampoline.o \
 
 
 USERS = \
 		src/user/_ls\
 		src/user/_init\
 
-
-
-
 .PRECIOUS: %.o
+
+XCFLAGS += -DSOL_HALO -DLAB_HALO
+CFLAGS += $(XCFLAGS)
+
+
 
 src/kernel/%.o: src/kernel/%.c
 	$(CC) $(CFLAGS) -c -o $@ $<

@@ -11,6 +11,8 @@ struct cpu cpus[NCPU];
 
 struct proc procs[NPROC];
 
+uint64 procStack[NPROC][PGSIZE];
+
 struct proc *initp;
 
 extern void forkret();
@@ -57,9 +59,11 @@ void initproc(){
 	initlock(&pid_lock, "nextpid");
   	initlock(&wait_lock, "wait_lock");	
 	
+	int i = 0;
 	for(p = procs; p < &procs[NPROC]; p++){
 		initlock(&p->slock,"proc");
 		p->kstack = KSTACK((int) (p - procs));
+		i++;		
 	}
 }
 
