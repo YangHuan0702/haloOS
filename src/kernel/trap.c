@@ -37,6 +37,7 @@ void usertrapret(){
 
     uint64 satp = MAKE_SATP(p->pagetable);
     uint64 fn = TRAMPOLINE + (userret - trampoline);
+    panic("usertrap...");
     ((void (*)(uint64,uint64))fn)(TRAPFRAME, satp);
 }
 
@@ -79,7 +80,7 @@ void kerneltrap(){
         return;
     }
     if((which_dev = devintr()) == 0){
-        printf("sepc=%p stval=%p\n scause=%d\n", r_sepc(), r_stval(),r_scause());
+        printf("sepc=%p stval=%p scause=%d\n", r_sepc(), r_stval(),r_scause());
         panic("kernel trap\n");
     }
     if(which_dev == 2 && myproc() != 0 && myproc()->state == RUNNING){

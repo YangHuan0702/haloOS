@@ -2,6 +2,7 @@
 #include "defs.h"
 #include "fs.h"
 #include "file.h"
+#include "riscv.h"
 
 #define NBUF 16
 #define INODES 32

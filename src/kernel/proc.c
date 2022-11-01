@@ -191,7 +191,6 @@ void scheduler(){
 			if(p->state == RUNNABLE){
 				p->state = RUNNING;
 				c->p = p;
-				printf("swtch proc name:%s ra:%p ,sp:%p , s0:%d , s11:%d\n",p->name,p->cont.ra,p->cont.sp,p->cont.s0,p->cont.s11);
 				swtch(&c->context,&p->cont);
 				c->p = 0;
 			}

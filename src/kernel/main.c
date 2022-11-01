@@ -29,6 +29,5 @@ int main(){
         plicinithart();
     }
     scheduler();
-
     return 0;
 }
