@@ -42,6 +42,9 @@ void userinit();
 int wait(uint64);
 void sleep(void*,struct spinlock*);
 void initproc();
+void proc_mapstacks(pagetable_t);
+
+
 // file.c
 void init_filecache();
 struct file* filealloc();
@@ -114,6 +117,6 @@ void kfree(void*);
 void freerange(void*,void*);
 void kinit();
 void* kalloc();
-void kvminit();
+void kvmmap(pagetable_t,uint64, uint64, uint64, int);
 
 #define NELEM(x) (sizeof(x)/sizeof((x)[0]))

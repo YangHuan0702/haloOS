@@ -36,6 +36,7 @@ OBJS = \
 		 src/kernel/sysproc.o \
 		 src/kernel/argsutil.o \
 		 src/kernel/trampoline.o \
+		 src/kernel/vm.o \
 
 
 USERS = \

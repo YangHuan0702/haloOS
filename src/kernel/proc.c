@@ -90,6 +90,18 @@ static void freeproc(struct proc *p){
 }
 
 
+void proc_mapstacks(pagetable_t pg){
+	struct proc *p;
+	for(p = procs; p < &procs[NPROC]; p++){
+		char *pa = kalloc();
+		if(pa == 0){
+			panic("proc_mapstacks kalloc...\n");
+		}
+		uint64 va = KSTACK((int) (p - procs));
+		kvmmap(pg, va, (uint64)pa, PGSIZE, PTE_R | PTE_W);
+	}
+}
+
 
 int wait(uint64 addr){
 	struct proc *p = myproc();
