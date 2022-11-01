@@ -143,3 +143,25 @@ void kinit(){
     w_satp(MAKE_SATP(kernel_pagetable));
     sfence_vma();
 }
+
+void uvminit(pagetable_t pagetable,uchar* src,uint sz){
+    char *mem;
+    if(sz > PGSIZE){
+        panic("inituvm: more than a page");
+    }    
+    mem = kalloc();
+    memset(mem,0,PGSIZE);
+    mappages(pagetable, 0, PGSIZE, (uint64)mem, PTE_W|PTE_R|PTE_X|PTE_U);
+    memmove(mem, src, sz);
+}
+
+pagetable_t uvmcreate(){
+    pagetable_t pagetable;
+    pagetable = (pagetable_t) kalloc();
+
+    if(pagetable == 0){ 
+        panic("uvmcreate kalloc panic..\n");
+    }    
+    memset(pagetable,0,PGSIZE);
+    return pagetable;
+}

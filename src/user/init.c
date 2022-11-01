@@ -5,6 +5,7 @@
 
 
 int main(){
+    printf("join init");
     if(open("console",O_RDWR) < 0){
 
     }

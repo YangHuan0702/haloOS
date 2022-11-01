@@ -3,23 +3,72 @@
 #include "riscv.h"
 #include "spinlock.h"
 #include "memlayout.h"
+#include "file.h"
+#include "proc.h"
 
 
 extern void kernelvec();
 
 struct spinlock slock;
 
-void usertrap(){
-            
+extern char trampoline[], uservec[], userret[];
+
+void usertrap();
+
+void usertrapret(){
+    struct proc *p = myproc();
+
+    intr_off();
+
+    w_stvec(TRAMPOLINE + (uservec - trampoline));
+
+    p->trapframe->kernel_satp = r_satp();
+    p->trapframe->kernel_sp = p->kstack + PGSIZE;
+    p->trapframe->kernel_trap = (uint64)usertrap;
+    p->trapframe->kernel_hartid = r_tp();
+
+
+    unsigned long x = r_sstatus();
+    x &= SSTATUS_SPP;
+    x |= SSTATUS_SPIE;
+    w_sstatus(x);
+
+    w_sepc(p->trapframe->epc);
+
+    uint64 satp = MAKE_SATP(p->pagetable);
+    uint64 fn = TRAMPOLINE + (userret - trampoline);
+    ((void (*)(uint64,uint64))fn)(TRAPFRAME, satp);
 }
 
 static volatile int timer_processed_count = 0;
 
+int devintr(){
+     uint64 scause = r_scause();
+     if((scause & 0x8000000000000000) && (scause & 0xff) == 9){
+        int irq = plic_claim();
+        if(irq == UART0_IRQ){
+            uartinterrupt();
+        }else if(irq == VIRTIO0_IRQ){
+            virtio_disk_isr();
+        }else{
+            printf("unknow irq:%d\n",irq);
+        }
+        if(irq){
+            complate_irq(irq);
+        }
+        return 1;
+     }else if(scause == 0x8000000000000001L){
+          w_sip(r_sip() & ~2);
+          return 2;
+     }else{
+        return 0;
+    }
+}
+
 void kerneltrap(){
-    printf("sepc=%p stval=%p\n scause=%d\n", r_sepc(), r_stval(),r_scause());
+    int which_dev;
     // 判断是否是软件中断
     uint64 sstatus = r_sstatus();
-    uint64 scause = r_scause();
     uint64 sepc = r_sepc();
     if((sstatus & SSTATUS_SPP) == 0){
         println("kerneltrap: interrupt from U Model");
@@ -29,33 +78,12 @@ void kerneltrap(){
         println("kerneltrap: Handle kernel interrupts SIE cannot be set");
         return;
     }
-    if((scause & 0x8000000000000000) && (scause & 0xff) == 9){
-        int irq = plic_claim();
-        if(irq == UART0_IRQ){
-            uartinterrupt();
-        }else if(irq == VIRTIO0_IRQ){
-            // VIRTIO interrupter code
-            virtio_disk_isr();
-        }else{
-            printf("unknow irq processed:%d\n",irq);
-        }
-        if(irq){
-            complate_irq(irq);
-        }
-    }else if(scause == 0x8000000000000001){
-        w_sip(r_sip() & ~2);
-        printf("ttt\n");
-        // timer_processed_count++;
-        // int current_tasks = get_tasks();
-        // if(0 == current_tasks){
-        //     return;
-        // }
-        // int task_num = timer_processed_count % current_tasks;
-        // printf("timer switch num:%d\n",task_num);
-        // run_target_task_num(task_num);
-    }else{
+    if((which_dev = devintr()) == 0){
         printf("sepc=%p stval=%p\n scause=%d\n", r_sepc(), r_stval(),r_scause());
         panic("kernel trap\n");
+    }
+    if(which_dev == 2 && myproc() != 0 && myproc()->state == RUNNING){
+        //yield();
     }
     
     w_sepc(sepc);
@@ -65,4 +93,31 @@ void kerneltrap(){
 void trapinit(){
     w_stvec((uint64)kernelvec);
     initlock(&slock,"trap");
+}
+
+
+void usertrap(){
+    int which_dev;
+    if((r_sstatus() & SSTATUS_SPP) != 0){
+        panic("usertrap: not from user mode");
+    }
+
+    w_stvec((uint64)kernelvec);
+
+    struct proc *p = myproc();
+
+    p->trapframe->epc = r_sepc();
+
+    if(r_scause() == 8){
+        p->trapframe->epc += 4;
+        intr_on();
+        syscall();
+    }else if((which_dev = devintr()) != 0){
+        // TODO
+    } else {
+        printf("usertrap(): unexpected scause %p pid=%d\n", r_scause(), p->pid);
+        printf("            sepc=%p stval=%p\n", r_sepc(), r_stval());
+        p->killed = 1;
+    }
+    usertrapret();
 }

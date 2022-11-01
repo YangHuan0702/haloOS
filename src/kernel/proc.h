@@ -77,8 +77,11 @@ struct proc {
   uint64 kstack;
 
   void *chan;
+  uint64 sz;
 
   struct trapframe *trapframe;
+
+  pagetable_t pagetable;
 
   struct context cont;
   struct file *openfs[OPENFILE];

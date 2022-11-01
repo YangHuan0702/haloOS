@@ -17,22 +17,32 @@ struct proc *initp;
 
 extern void forkret();
 
+uchar initcode[] = {
+  0x17, 0x05, 0x00, 0x00, 0x13, 0x05, 0x45, 0x02,
+  0x97, 0x05, 0x00, 0x00, 0x93, 0x85, 0x35, 0x02,
+  0x93, 0x08, 0x70, 0x00, 0x73, 0x00, 0x00, 0x00,
+  0x93, 0x08, 0x20, 0x00, 0x73, 0x00, 0x00, 0x00,
+  0xef, 0xf0, 0x9f, 0xff, 0x2f, 0x69, 0x6e, 0x69,
+  0x74, 0x00, 0x00, 0x24, 0x00, 0x00, 0x00, 0x00,
+  0x00, 0x00, 0x00, 0x00
+};
+
+extern char trampoline[];
+
 struct spinlock pid_lock;
 struct spinlock wait_lock;
 volatile int nextPid = 1;
 
 
 void forkret(){
-	printf("---------");
 	static int firstinit = 1;
-	panic("join forkret\n");
 	release(&myproc()->slock);
 
 	if(firstinit){
 		firstinit = 0;
 		initfs(ROOTDEV);
 	}
-	// TODO
+	usertrapret();
 }
 
 int cpuid(){
@@ -175,7 +185,7 @@ void scheduler(){
 	struct cpu *c = mycpu();
 	c->p = 0;
 	for(;;){
-		// intr_on();
+		intr_on();
 		for(p = procs; p < &procs[NPROC];p++){
 			acquire(&p->slock);
 			if(p->state == RUNNABLE){
@@ -190,6 +200,16 @@ void scheduler(){
 	}
 }
 
+pagetable_t proc_pagetable(struct proc *p){
+	pagetable_t pagetable;
+
+	pagetable = uvmcreate();
+	mappages(pagetable, TRAMPOLINE, PGSIZE,(uint64)trampoline, PTE_R | PTE_X);
+
+	mappages(pagetable, TRAPFRAME, PGSIZE,(uint64)(p->trapframe), PTE_R | PTE_W);
+	return pagetable;
+}
+
 static struct proc* allocproc(){
 	struct proc *p;
 
@@ -198,6 +218,13 @@ static struct proc* allocproc(){
 		if(p->state == UNUSED){
 			p->pid = allocpid();
 			p->state = USED;
+
+			if((p->trapframe = (struct trapframe*)kalloc()) == 0){
+				panic("alloc p->trapframe panic...\n");
+			}
+
+			p->pagetable = proc_pagetable(p);
+
 			memset(&p->cont,0,sizeof(p->cont));
 			p->cont.ra = (uint64) forkret;
 			p->cont.sp = p->kstack + PGSIZE;
@@ -211,9 +238,12 @@ static struct proc* allocproc(){
 void userinit(){
 	struct proc *p = allocproc();
 	initp = p;
-	printf("first proc ra is: %p\n",p->cont.ra);
-	// p->trapframe->epc = 0;
-	// p->trapframe->sp = PGSIZE;
+
+	uvminit(p->pagetable, initcode, sizeof(initcode));
+	
+	p->sz = PGSIZE;
+	p->trapframe->epc = 0;
+	p->trapframe->sp = PGSIZE;
 	safestrcpy(p->name,"initcode",sizeof(p->name));
 	p->pwd = rooti();
 	p->state = RUNNABLE;

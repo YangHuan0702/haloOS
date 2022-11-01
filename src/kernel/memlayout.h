@@ -11,6 +11,7 @@
 #define SIE_STIE (1L << 5) // 时间中断
 #define SIE_SSIE (1L << 1) // 软件中断
 
+#define TRAPFRAME (TRAMPOLINE - PGSIZE)
 
 // MSTATUS
 #define MSTATUS_MIE (1 << 3)

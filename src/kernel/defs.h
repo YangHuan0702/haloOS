@@ -18,6 +18,8 @@ void push_off();
 void pop_off();
 int holdinglock(struct spinlock*);
 
+// syscall.c
+void syscall();
 
 // sleeplock.c
 void sleep_lock(struct sleeplock*);
@@ -67,6 +69,7 @@ void complate_irq(int);
 
 // trap.c
 void trapinit();
+void usertrapret();
 
 // console.c
 void consoleinit();
@@ -118,5 +121,8 @@ void freerange(void*,void*);
 void kinit();
 void* kalloc();
 void kvmmap(pagetable_t,uint64, uint64, uint64, int);
+int mappages(pagetable_t,uint64,uint64,uint64,int);
+void uvminit(pagetable_t,uchar*,uint);
+pagetable_t uvmcreate();
 
 #define NELEM(x) (sizeof(x)/sizeof((x)[0]))
