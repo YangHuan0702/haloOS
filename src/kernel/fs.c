@@ -32,7 +32,6 @@ static void readsb(int dev,struct superblock *sb){
 
 void initfs(int dev){
     readsb(dev,&sb);
-    printf("sb.magic: %p ninodes:%d\n",sb.magic,sb.ninodes);
     if(sb.magic != FSMAGIC){
         panic("invalid file system");
     }
@@ -70,6 +69,7 @@ static struct buf* bget(uint dev,uint blockno){
         if(r->dev == dev && r->blockno == blockno){
             r->refcnt++;
             release(&bcache.slock);
+            sleep_lock(&r->sk);
             return r;
         }
     }
@@ -80,6 +80,7 @@ static struct buf* bget(uint dev,uint blockno){
             r->dev =dev;
             r->blockno = blockno;
             release(&bcache.slock);
+            sleep_lock(&r->sk);
             return r;
         }
     }
@@ -154,8 +155,10 @@ int readi(struct inode* ip,int user_dst,uint64 dst,uint off,uint n){
         m = min(n - tot,BSIZE - off % BSIZE);
         if(copyout(user_dst,dst,b->data + (off % BSIZE),m) == -1){
             tot = -1;
+            brelease(b);
             break;
         }
+        brelease(b);
     }
     return tot;
 }
@@ -178,23 +181,26 @@ struct inode* iget(uint dev,uint inum){
     if(r == 0){
         panic("getInodeByDevAndINum panic");
     }
-
-    r->dev = dev;
-    r->inum = inum;
-    r->ref = 1;
-    r->vaild = 0;
+    i = r;
+    i->dev = dev;
+    i->inum = inum;
+    i->ref = 1;
+    i->vaild = 0;
     release(&inodecache.slock);
-    return r;
+    return i;
 }
-
 
 struct inode* rooti(){
     return iget(ROOTDEV,ROOTINO);
 }
 
+
 struct inode* iname(char *name){
+    struct inode *i;
     struct inode *dp = iget(ROOTDEV,ROOTINO);
-    return inodeByName(dp,name);
+    ilock(dp);
+    i = inodeByName(dp,name);
+    return i;
 }
 
 struct inode* inodeByName(struct inode* ip,char* name){
@@ -209,6 +215,70 @@ struct inode* inodeByName(struct inode* ip,char* name){
         }
     }
     return 0;    
+}
+
+void brelease(struct buf *b){
+    if(!holdingsleep(&b->sk)){
+        panic("brelease holdingsleep panic\n");
+    }
+    sleep_unlock(&b->sk);
+
+    acquire(&bcache.slock);
+    b->refcnt --;
+    if(b->refcnt == 0){
+        b->next->prev = b->prev;
+        b->prev->next = b->next;
+        b->next = bcache.head.next;
+        b->prev = &bcache.head;
+        bcache.head.next = b;
+        bcache.head.next->prev = b;
+    }
+    release(&bcache.slock);
+}
+
+void ilock(struct inode* i){
+    struct buf *b;
+    struct dinode *dip;
+    if(i == 0 || i->ref < 1){
+        panic("ilock");
+    }
+    sleep_lock(&i->splock);
+
+    if(i->vaild == 0){
+        b = bread(i->dev,IBLOCK(i->inum,sb));
+
+        dip = (struct dinode*) b->data + i->inum % IPB;
+        i->type = dip->type;
+        i->size = dip->size;
+        i->major = dip->major;
+        i->minor = dip->minor;
+        i->nlink = dip->nlink;
+        memmove(i->addrs,dip->addrs,sizeof(i->addrs));
+        brelease(b);
+        i->vaild = 0;
+    }
+}
+
+void itrunc(struct inode *i){
+    // TODO
+}
+
+void iunlock(struct inode *i){
+    if( i == 0 || !holdingsleep(&i->splock) || i->ref < 1){
+        panic("iunlock");
+    }
+    sleep_unlock(&i->splock);
+}
+
+void iput(struct inode *i){
+    acquire(&inodecache.slock);
+    if(i->ref == 1 && i->vaild && i->nlink == 0){
+        sleep_lock(&i->splock);
+    
+        sleep_unlock(&i->splock);
+    }
+    i->ref --;
+    release(&inodecache.slock);
 }
 
 

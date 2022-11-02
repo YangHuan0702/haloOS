@@ -14,6 +14,7 @@ extern uint64 sys_wait(void);
 static uint64 (*syscalls[])(void) = {
     [SYS_WRITE]     sys_write,
     [SYS_EXEC]      sys_exec,
+    [SYS_EXEC2]     sys_exec,
     [SYS_DUP]       sys_dup,
     [SYS_OPEN]      sys_open,
     [SYS_WAIT]      sys_wait,

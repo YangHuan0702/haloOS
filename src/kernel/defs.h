@@ -25,6 +25,7 @@ void syscall();
 void sleep_lock(struct sleeplock*);
 void sleep_unlock(struct sleeplock*);
 void sleep_initlock(struct sleeplock*,char*);
+int holdingsleep(struct sleeplock*);
 
 // exec.c
 int exec(char*,char**);
@@ -87,7 +88,9 @@ int writei(struct inode*,int,uint64,uint,uint);
 struct inode* iname(char*);
 void initfs(int);
 void init_bcache();
+void brelease(struct buf*);
 void init_inodecache();
+void ilock(struct inode*);
 
 // print.c
 void printf(char*, ...);

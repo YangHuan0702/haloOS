@@ -8,20 +8,20 @@
 int exec(char *path,char** argv){
     struct inode *node = rooti();
     path+=1;
+    ilock(node);
     struct inode *app = inodeByName(node,path);
-    if(app == 0){
-        panic("exec: dont`t find to app");
-    }
     struct proc *p = myproc();
 
     struct elfhdr elf;
     struct proghdr ph;
+    printf("----------");
     if(readi(app,0,(uint64)&elf,0,sizeof(elf)) != sizeof(elf)){
         return -1;
     }
+    printf("------");
     if(elf.magic != ELF_MAGIC){
         return -1;
-    }    
+    }
     int i,off;
     for(i=0,off=elf.phoff; i< elf.phnum;i++,off+=sizeof(ph)){
         if(readi(app,0,(uint64)&ph,off,sizeof(ph)) != sizeof(ph)){
@@ -38,6 +38,7 @@ int exec(char *path,char** argv){
         }
     }
     p->trapframe->epc = elf.entry;
+    printf("exec success");
     return 0;
 
 }

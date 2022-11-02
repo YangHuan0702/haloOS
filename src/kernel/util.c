@@ -31,15 +31,12 @@ memmove(void *dst, const void *src, uint n)
   return dst;
 }
 
-
-int strncmp(const char* a,const char* b,int n){
-    while (n > 0 && *a == *b && *a) {
-        n--;
-        a++;
-        b++;
-    }
-    if(n == 0){
-        return 0;
-    }
-    return (uchar)*a - (uchar)*b;
+int
+strncmp(const char *p, const char *q, uint n)
+{
+  while(n > 0 && *p && *p == *q)
+    n--, p++, q++;
+  if(n == 0)
+    return 0;
+  return (uchar)*p - (uchar)*q;
 }
