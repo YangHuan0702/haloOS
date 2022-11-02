@@ -58,6 +58,7 @@ static void free_desc(int i)
   disk.desc[i].flags = 0;
   disk.desc[i].next = 0;
   disk.free[i] = 1;
+  wakeup(&disk.free[0]);
 }
 
 //分配三个描述符（它们不必是连续的）。 磁盘传输总是使用三个描述符
@@ -135,8 +136,6 @@ void virt_disk_rw(struct buf *b, int write) {
     b->disk = 1;
     disk.info[idx[0]].b = b;
 
-    __sync_synchronize();
-
     // 告诉设备我们的描述符链中的第一个索引
     disk.avail->ring[disk.avail->index % NUM] = idx[0];
 
@@ -144,6 +143,9 @@ void virt_disk_rw(struct buf *b, int write) {
 
     //告诉设备另一个可用ring条目可用
     disk.avail->index += 1; // not % NUM ...
+
+    __sync_synchronize();
+
 
     *R(VIRTIO_MMIO_QUEUE_NOTIFY) = 0; //当我们将0写入queue_notify时，设备会立即启动
     while (b->disk == 1) {

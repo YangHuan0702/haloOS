@@ -26,7 +26,7 @@ struct {
 
 static void readsb(int dev,struct superblock *sb){
     struct buf *f = bread(dev,1);
-    memmove(f->data,sb,sizeof(*sb));
+    memmove(sb,f->data,sizeof(*sb));
 }
 
 

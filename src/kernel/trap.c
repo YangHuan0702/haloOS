@@ -16,7 +16,6 @@ extern char trampoline[], uservec[], userret[];
 void usertrap();
 
 void usertrapret(){
-    printf("-----------");
     struct proc *p = myproc();
 
     intr_off();
@@ -38,7 +37,6 @@ void usertrapret(){
 
     uint64 satp = MAKE_SATP(p->pagetable);
     uint64 fn = TRAMPOLINE + (userret - trampoline);
-    panic("usertrap...");
     ((void (*)(uint64,uint64))fn)(TRAPFRAME, satp);
 }
 

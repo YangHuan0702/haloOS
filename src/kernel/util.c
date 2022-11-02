@@ -8,26 +8,29 @@ char* memset(void *target,int val,int end){
     return upd;
 }
 
-void* memmove(void* dst,void* src,int n){
-    if(n == 0){
-        return dst;
-    }
-    char *s = src;
-    char *d = dst;
+void*
+memmove(void *dst, const void *src, uint n)
+{
+  const char *s;
+  char *d;
 
-    if(s < d && s + n > d ){
-        s += n;
-        d += n;
-        while (n-- > 0) {
-            *--d = *--s;
-        }
-    }else{
-        while (n-- > 0) {
-            *d++ = *s++;
-        }
-    }    
+  if(n == 0)
     return dst;
+  
+  s = src;
+  d = dst;
+  if(s < d && s + n > d){
+    s += n;
+    d += n;
+    while(n-- > 0)
+      *--d = *--s;
+  } else
+    while(n-- > 0)
+      *d++ = *s++;
+
+  return dst;
 }
+
 
 int strncmp(const char* a,const char* b,int n){
     while (n > 0 && *a == *b && *a) {
