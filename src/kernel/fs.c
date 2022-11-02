@@ -39,14 +39,17 @@ void initfs(int dev){
 }
 
 void init_bcache() {
-    bcache.slock.locked = 0;
-    bcache.slock.name = "bcache";
+    initlock(&bcache.slock,"bcache");
+    bcache.head.prev = &bcache.head;
+    bcache.head.next = &bcache.head;
 
-    for(int i = 0; i < NBUF; i++){
-        bcache.bufs[i].refcnt = 0;
-        sleep_initlock(&bcache.bufs[i].sk,"buf");
-        bcache.bufs[i].vaild = 0;
-        bcache.bufs[i].disk = 0;
+    struct buf *b;
+    for(b = bcache.bufs; b < bcache.bufs+NBUF;b++){
+        b->next = bcache.head.next;
+        b->prev = &bcache.head;
+        sleep_initlock(&b->sk, "buffer");
+        bcache.head.next->prev = b;
+        bcache.head.next = b;
     }
 }
 

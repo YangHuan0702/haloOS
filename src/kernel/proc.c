@@ -223,7 +223,9 @@ static struct proc* allocproc(){
 			}
 
 			p->pagetable = proc_pagetable(p);
-
+			if(p->pagetable == 0){
+				panic("alloproc proc_pagetable alloced panic");
+			}
 			memset(&p->cont,0,sizeof(p->cont));
 			p->cont.ra = (uint64) forkret;
 			p->cont.sp = p->kstack + PGSIZE;

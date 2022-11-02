@@ -16,6 +16,7 @@ extern char trampoline[], uservec[], userret[];
 void usertrap();
 
 void usertrapret(){
+    printf("-----------");
     struct proc *p = myproc();
 
     intr_off();
