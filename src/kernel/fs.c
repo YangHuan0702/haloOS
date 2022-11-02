@@ -32,6 +32,7 @@ static void readsb(int dev,struct superblock *sb){
 
 void initfs(int dev){
     readsb(dev,&sb);
+    printf("sb.magic: %p ninodes:%d\n",sb.magic,sb.ninodes);
     if(sb.magic != FSMAGIC){
         panic("invalid file system");
     }

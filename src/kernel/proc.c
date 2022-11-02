@@ -11,8 +11,6 @@ struct cpu cpus[NCPU];
 
 struct proc procs[NPROC];
 
-uint64 procStack[NPROC][PGSIZE];
-
 struct proc *initp;
 
 extern void forkret();
@@ -48,6 +46,17 @@ void forkret(){
 int cpuid(){
 	int cpuid = r_tp();
 	return cpuid;
+}
+
+void wakeup(void *chan){
+	struct proc *p;
+	for(p = procs;p < procs+NPROC; p++){
+		acquire(&p->slock);
+		if(p->state == SLEEPING && p->chan == chan){
+			p->state = RUNNABLE;
+		}
+		release(&p->slock);
+	}
 }
 
 struct cpu* mycpu(){
@@ -149,7 +158,7 @@ int wait(uint64 addr){
 
 void sched(){
 	struct proc *p = myproc();
-	if(holdinglock(&p->slock)){
+	if(!holdinglock(&p->slock)){
 		panic("sched holdinglock \n");
 	}
 	if(p->state == RUNNING){

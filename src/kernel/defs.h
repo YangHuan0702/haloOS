@@ -45,7 +45,7 @@ int wait(uint64);
 void sleep(void*,struct spinlock*);
 void initproc();
 void proc_mapstacks(pagetable_t);
-
+void wakeup(void*);
 
 // file.c
 void init_filecache();

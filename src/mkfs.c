@@ -261,7 +261,10 @@ int main(int argc,char *argv[]){
     din.size = off;
     winode(rootinode,&din);
 
+
     balloc(freeBlock);
     printf("mkfs success!\n");
+    printf("==========\n");
+    printf("sb.nblocks:%d\n",sb.nblocks);
     exit(0);
 }

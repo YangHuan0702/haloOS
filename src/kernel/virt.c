@@ -147,6 +147,7 @@ void virt_disk_rw(struct buf *b, int write) {
 
     *R(VIRTIO_MMIO_QUEUE_NOTIFY) = 0; //当我们将0写入queue_notify时，设备会立即启动
     while (b->disk == 1) {
+      sleep(b, &disk.disklock);
     }
 
     disk.info[idx[0]].b = 0;
@@ -246,7 +247,12 @@ void virtio_disk_isr()
       println("virtio_disk_intr status");
     }
     struct buf *b = disk.info[id].b;
+    if(b == 0){
+      printf("id :%d\n",id);
+      panic("virtio_disk_isr: buf is empty");
+    }
     b->disk = 0;
+    wakeup(b);
     disk.used_idx += 1;
   }
 
