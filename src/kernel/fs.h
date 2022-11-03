@@ -117,3 +117,4 @@ struct dirent {
 #define NINDIRECT (BSIZE / sizeof(uint))
 #define MAXFILE (NDIRECT + NINDIRECT)
 
+#define BBLOCK(b,sb) ((b) / BPB + sb.bmapstart)

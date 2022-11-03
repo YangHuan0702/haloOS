@@ -1,25 +1,24 @@
 #include "type.h"
 #include "defs.h"
 #include "file.h"
-#include "spinlock.h"
+#include "fs.h"
 #include "proc.h"
 #include "elf.h"
 
 int exec(char *path,char** argv){
-    struct inode *node = rooti();
     path+=1;
-    ilock(node);
-    struct inode *app = inodeByName(node,path);
+    struct inode *app = rootsub(path);
+    ilock(app);
     struct proc *p = myproc();
 
     struct elfhdr elf;
     struct proghdr ph;
-    printf("----------");
     if(readi(app,0,(uint64)&elf,0,sizeof(elf)) != sizeof(elf)){
+        printf("readi panic");
         return -1;
     }
-    printf("------");
     if(elf.magic != ELF_MAGIC){
+        printf("ELF MAGIC Panic");
         return -1;
     }
     int i,off;
@@ -37,8 +36,8 @@ int exec(char *path,char** argv){
             panic("exec() ph.vaddr + ph.memsz < ph.vaddr...\n");
         }
     }
+    iunlockput(app);
     p->trapframe->epc = elf.entry;
-    printf("exec success");
     return 0;
 
 }

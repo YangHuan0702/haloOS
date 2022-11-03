@@ -91,6 +91,10 @@ void init_bcache();
 void brelease(struct buf*);
 void init_inodecache();
 void ilock(struct inode*);
+struct inode* rootsub(char*);
+void iunlockput(struct inode*);
+void iunlock(struct inode*);
+void iput(struct inode*);
 
 // print.c
 void printf(char*, ...);

@@ -195,6 +195,15 @@ struct inode* rooti(){
 }
 
 
+struct inode* rootsub(char *name){
+    struct inode *root = rooti();
+    ilock(root);
+    struct inode *sub = inodeByName(root,name);
+    iunlockput(root);
+    return sub;
+}
+
+
 struct inode* iname(char *name){
     struct inode *i;
     struct inode *dp = iget(ROOTDEV,ROOTINO);
@@ -224,15 +233,17 @@ void brelease(struct buf *b){
     sleep_unlock(&b->sk);
 
     acquire(&bcache.slock);
-    b->refcnt --;
-    if(b->refcnt == 0){
+
+    b->refcnt--;
+    if (b->refcnt == 0) {
         b->next->prev = b->prev;
         b->prev->next = b->next;
         b->next = bcache.head.next;
         b->prev = &bcache.head;
-        bcache.head.next = b;
         bcache.head.next->prev = b;
+        bcache.head.next = b;
     }
+
     release(&bcache.slock);
 }
 
@@ -259,8 +270,46 @@ void ilock(struct inode* i){
     }
 }
 
-void itrunc(struct inode *i){
-    // TODO
+static void bfree(int dev,uint b){
+    struct buf *bp = bread(dev,BBLOCK(b,sb));
+    int bi = b % BPB;
+    int m = 1 << (bi % 8);
+    if((bp->data[bi/8] & m) == 0){
+        panic("freeing free block");
+    }
+    bp->data[bi/8] &= ~m;
+    // TODO log write
+    brelease(bp);
+}
+
+void iunlockput(struct inode *ip){
+    iunlock(ip);
+    iput(ip);
+}
+
+void itrunc(struct inode *ip){
+    struct buf *b;
+    for(int i =0;i < NDIRECT;i++){
+        if(ip->addrs[i]){
+            bfree(ip->dev,ip->addrs[i]);
+            ip->addrs[i] = 0;
+        }
+    }
+
+    if(ip->addrs[NDIRECT]){
+        b = bread(ip->dev,ip->addrs[NDIRECT]);
+        uint *a = (uint*)b->data;
+        for(int i = 0; i < NDIRECT;i++){
+            if(a[i]){
+                bfree(ip->dev,a[i]);
+            }
+        }
+        brelease(b);
+        bfree(ip->dev,ip->addrs[NDIRECT]);
+        ip->addrs[NDIRECT] = 0;
+    } 
+    ip->size = 0;
+    iupdate(ip);
 }
 
 void iunlock(struct inode *i){
@@ -274,8 +323,14 @@ void iput(struct inode *i){
     acquire(&inodecache.slock);
     if(i->ref == 1 && i->vaild && i->nlink == 0){
         sleep_lock(&i->splock);
+        release(&inodecache.slock);
     
+        itrunc(i);
+        i->type = 0;
+        iupdate(i);
+        i->vaild = 0;
         sleep_unlock(&i->splock);
+        acquire(&inodecache.slock);
     }
     i->ref --;
     release(&inodecache.slock);
@@ -308,6 +363,7 @@ void iupdate(struct inode *ip){
     dip->size = ip->size;
     memmove(dip->addrs, ip->addrs, sizeof(ip->addrs));
     // TODO : already write to cache buf , now should write to log 
+    brelease(b);
 }
 
 int writei(struct inode *ip,int user_src,uint64 src,uint off, uint n){
