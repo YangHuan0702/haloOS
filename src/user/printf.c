@@ -8,7 +8,7 @@ static char nums[] = "0123456789abcdef";
 
 void putc(int fd, char c)
 {
-  write(fd, &c, 1);
+    write(fd, &c, 1);
 }
 
 static void printInt(int val,int u){

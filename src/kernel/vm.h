@@ -8,7 +8,7 @@
 #define PXMASK      0x1FF // 9 bits
 #define PXSHIFT(level)  (PGSHIFT+(9*(level)))
 #define PX(level,va)    ((((uint64) (va)) >> PXSHIFT(level)) & PXMASK)
-
+#define PTE_FLAGS(pte) ((pte) & 0x3FF)
 
 #define TRAMPOLINE (MAXVA - PGSIZE)
 #define KSTACK(p) (TRAMPOLINE - ((p)+1)* 2*PGSIZE)

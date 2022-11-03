@@ -83,7 +83,7 @@ void kerneltrap(){
         panic("kernel trap\n");
     }
     if(which_dev == 2 && myproc() != 0 && myproc()->state == RUNNING){
-        //yield();
+        yield();
     }
     
     w_sepc(sepc);
@@ -101,13 +101,9 @@ void usertrap(){
     if((r_sstatus() & SSTATUS_SPP) != 0){
         panic("usertrap: not from user mode");
     }
-
     w_stvec((uint64)kernelvec);
-
     struct proc *p = myproc();
-
     p->trapframe->epc = r_sepc();
-
     if(r_scause() == 8){
         p->trapframe->epc += 4;
         intr_on();

@@ -47,6 +47,8 @@ void sleep(void*,struct spinlock*);
 void initproc();
 void proc_mapstacks(pagetable_t);
 void wakeup(void*);
+void yield();
+pagetable_t proc_pagetable(struct proc*);
 
 // file.c
 void init_filecache();
@@ -131,5 +133,13 @@ void kvmmap(pagetable_t,uint64, uint64, uint64, int);
 int mappages(pagetable_t,uint64,uint64,uint64,int);
 void uvminit(pagetable_t,uchar*,uint);
 pagetable_t uvmcreate();
+uint64 walkaddr(pagetable_t,uint64);
+uint64 uvmalloc(pagetable_t,uint64,uint64);
+uint64 uvmdealloc(pagetable_t,uint64,uint64);
+void uvmunmap(pagetable_t,uint64,uint64,int);
+void uvmclear(pagetable_t,uint64);
+void proc_freepagetable(pagetable_t,uint64);
+void freewalk(pagetable_t);
+pte_t* walk(pagetable_t,uint64,int);
 
 #define NELEM(x) (sizeof(x)/sizeof((x)[0]))

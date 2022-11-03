@@ -48,8 +48,6 @@ USERS = \
 XCFLAGS += -DSOL_HALO -DLAB_HALO
 CFLAGS += $(XCFLAGS)
 
-
-
 src/kernel/%.o: src/kernel/%.c
 	$(CC) $(CFLAGS) -c -o $@ $<
 

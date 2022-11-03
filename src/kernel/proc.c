@@ -210,6 +210,15 @@ void scheduler(){
 	}
 }
 
+
+void yield(){
+	struct proc *p = myproc();
+	acquire(&p->slock);
+	p->state = RUNNABLE;
+	sched();
+	release(&p->slock);
+}
+
 pagetable_t proc_pagetable(struct proc *p){
 	pagetable_t pagetable;
 
