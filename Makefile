@@ -125,3 +125,4 @@ clean:
 	rm -f *.elf src/kernel/*.o src/kernel/kernel src/kernel/kernel.asm src/kernel/kernel.sym
 	rm -f src/user/*.o src/user/*.sym src/user/*.asm $(USERS)
 	rm -rf src/user/initcode src/user/*.out
+	rm -rf src/kernel/*.d
