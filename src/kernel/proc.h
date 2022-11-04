@@ -1,6 +1,6 @@
 
 #define MAX_TASK  1024
-#define NPROC     68
+#define NPROC     64
 
 
 struct trapframe {

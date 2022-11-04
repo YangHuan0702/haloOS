@@ -115,7 +115,8 @@ void virtio_disk_isr();
 uint copyout(int,uint64,void*,int);
 int either_copy(void*,int,uint64,uint64);
 int either_copyout(int,uint64,void*,uint64);
-
+int copyoutpg(pagetable_t,uint64,char*,uint64);
+int strlen(const char*);
 
 // uitl.c
 char* memset(void*,int,int);
@@ -141,5 +142,6 @@ void uvmclear(pagetable_t,uint64);
 void proc_freepagetable(pagetable_t,uint64);
 void freewalk(pagetable_t);
 pte_t* walk(pagetable_t,uint64,int);
+void uvmfree(pagetable_t,uint64);
 
 #define NELEM(x) (sizeof(x)/sizeof((x)[0]))

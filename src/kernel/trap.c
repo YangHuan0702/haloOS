@@ -32,9 +32,7 @@ void usertrapret(){
     x &= SSTATUS_SPP;
     x |= SSTATUS_SPIE;
     w_sstatus(x);
-
     w_sepc(p->trapframe->epc);
-
     uint64 satp = MAKE_SATP(p->pagetable);
     uint64 fn = TRAMPOLINE + (userret - trampoline);
     ((void (*)(uint64,uint64))fn)(TRAPFRAME, satp);

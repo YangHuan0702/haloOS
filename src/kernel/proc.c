@@ -223,9 +223,15 @@ pagetable_t proc_pagetable(struct proc *p){
 	pagetable_t pagetable;
 
 	pagetable = uvmcreate();
-	mappages(pagetable, TRAMPOLINE, PGSIZE,(uint64)trampoline, PTE_R | PTE_X);
+	if(mappages(pagetable, TRAMPOLINE, PGSIZE,(uint64)trampoline, PTE_R | PTE_X) < 0){
+		uvmfree(pagetable, 0);
+    	return 0;
+	}
 
-	mappages(pagetable, TRAPFRAME, PGSIZE,(uint64)(p->trapframe), PTE_R | PTE_W);
+	if(mappages(pagetable, TRAPFRAME, PGSIZE,(uint64)(p->trapframe), PTE_R | PTE_W) < 0){
+		uvmfree(pagetable, 0);
+    	return 0;
+	};
 	return pagetable;
 }
 

@@ -34,11 +34,8 @@ static void printInt(int val,int u){
 
 
 static void printPtr(uint64 ptr){
-    if(!ptr)
-        return;
     uart_putc('0');
     uart_putc('x');
-    
     for(int i = 0; i < (sizeof(uint64) * 2); i++,ptr <<= 4){
         uart_putc(nums[ptr >> (sizeof(uint64) * 8 - 4)]);
     }

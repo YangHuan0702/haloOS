@@ -1,5 +1,6 @@
 #include "type.h"
 #include "defs.h"
+#include "riscv.h"
 
 uint copyout(int user_dst,uint64 dst,void *src,int n){
     if(user_dst){
@@ -9,6 +10,25 @@ uint copyout(int user_dst,uint64 dst,void *src,int n){
         memmove((char*) dst,src,n);
         return 0;
     }
+}
+
+int copyoutpg(pagetable_t pagetable,uint64 dstva,char *src,uint64 len){
+    while (len > 0) {
+        uint64 va0 = PGROUNDDOWN(dstva);
+        uint64 pa0 = walkaddr(pagetable, va0);
+        if(pa0 == 0){
+            return -1;
+        }
+        uint64 n = PGSIZE - (dstva - va0);
+        if(n > len){
+            n = len;
+        }
+        memmove((void *)(pa0 + (dstva - va0)), src, n);
+        len -= n;
+        src += n;
+        dstva = va0 + PGSIZE;
+    }
+    return 0;
 }
 
 int either_copyout(int user_dst,uint64 dst,void *src,uint64 len){

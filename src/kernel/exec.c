@@ -5,6 +5,7 @@
 #include "proc.h"
 #include "elf.h"
 #include "riscv.h"
+#include "param.h"
 
 static int loadseg(pagetable_t pagetable,uint64 va,struct inode *ip,struct proghdr ph,uint64 off,uint64 sz){
     int n = 0;
@@ -64,6 +65,9 @@ int exec(char *path,char** argv){
             panic("loadseg uvmalloc panic");
         }
         sz = sz1;
+        if((ph.vaddr % PGSIZE) != 0){
+            panic("exec:(ph.vaddr %% PGSIZE) != 0");
+        }
         if(loadseg(pagetable,ph.vaddr,app,ph,ph.off,ph.filesz) < 0){
             panic("loadseg panic");
         }
@@ -79,7 +83,35 @@ int exec(char *path,char** argv){
     sz = sz1;
     uvmclear(pagetable, sz-2*PGSIZE);
     uint64 sp = sz;
+    uint64 stackbase = sp - PGSIZE;
 
+    uint64 argc = 0;
+    uint64 ustack[MAXARG];
+    if(argv){
+        for(argc = 0; argv[argc]; argc++) {
+            if(argc >= MAXARG){
+                panic("argc >= MAXARG");
+            }
+            sp -= strlen(argv[argc]) + 1;
+            sp -= sp % 16; // riscv sp must be 16-byte aligned
+            if(sp < stackbase){
+                panic("exec:sp < stackbase");
+            }
+            if(copyoutpg(pagetable, sp, argv[argc], strlen(argv[argc]) + 1) < 0){
+                panic("exec:copyout");
+            }
+            ustack[argc] = sp;
+        }
+    }
+    ustack[argc] = 0;
+    sp -= (argc+1) * sizeof(uint64);
+    sp -= sp % 16;
+    if(sp < stackbase){
+        panic("if(sp < stackbase)");
+    }
+    if(copyoutpg(pagetable, sp, (char *)ustack, (argc+1)*sizeof(uint64)) < 0){
+        panic("exec:copyout");     
+    }
     p->trapframe->a1 = sp;
 
     char *s,*last;
@@ -88,14 +120,13 @@ int exec(char *path,char** argv){
             last = s+1;
         }
     }
+    safestrcpy(p->name, last, sizeof(p->name));
 
     pagetable_t oldpagetable = p->pagetable;
-    safestrcpy(p->name, last, sizeof(p->name));
     p->pagetable = pagetable;
     p->sz = sz;
     p->trapframe->epc = elf.entry;
     p->trapframe->sp = sp;
     proc_freepagetable(oldpagetable, oldsz);
     return 0;
-
 }

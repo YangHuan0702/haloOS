@@ -40,3 +40,13 @@ strncmp(const char *p, const char *q, uint n)
     return 0;
   return (uchar)*p - (uchar)*q;
 }
+
+int
+strlen(const char *s)
+{
+  int n;
+
+  for(n = 0; s[n]; n++)
+    ;
+  return n;
+}
