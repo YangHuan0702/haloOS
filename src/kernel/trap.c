@@ -27,13 +27,14 @@ void usertrapret(){
     p->trapframe->kernel_trap = (uint64)usertrap;
     p->trapframe->kernel_hartid = r_tp();
 
-
     unsigned long x = r_sstatus();
-    x &= SSTATUS_SPP;
+    x &= ~SSTATUS_SPP;
     x |= SSTATUS_SPIE;
     w_sstatus(x);
+
     w_sepc(p->trapframe->epc);
     uint64 satp = MAKE_SATP(p->pagetable);
+    
     uint64 fn = TRAMPOLINE + (userret - trampoline);
     ((void (*)(uint64,uint64))fn)(TRAPFRAME, satp);
 }
@@ -95,7 +96,7 @@ void trapinit(){
 
 
 void usertrap(){
-    int which_dev;
+    int which_dev = 0;
     if((r_sstatus() & SSTATUS_SPP) != 0){
         panic("usertrap: not from user mode");
     }
@@ -112,6 +113,9 @@ void usertrap(){
         printf("usertrap(): unexpected scause %p pid=%d\n", r_scause(), p->pid);
         printf("            sepc=%p stval=%p\n", r_sepc(), r_stval());
         p->killed = 1;
+    }
+    if(which_dev == 2){
+        yield();
     }
     usertrapret();
 }

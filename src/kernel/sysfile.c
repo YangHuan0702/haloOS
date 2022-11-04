@@ -89,7 +89,23 @@ static struct inode* create(char *path,short type,short major,short minor){
     return ip;
 }
 
-uint64 sys_write(){
+uint64 sys_write() {
+    // struct file *f;
+    // int n;
+    // uint64 p;
+    // if(argfd(0,0,&f) < 0 || argint(2,&n) < 0 || argaddr(1,&p) < 0){
+    //     if(argfd(0,0,&f) < 0){
+    //         panic("argfd");
+    //     }
+    //     if(argint(2,&n) < 0){
+    //         panic("argint");
+    //     }
+    //     if(argaddr(1,&p) < 0){
+    //         panic("argaddr");
+    //     }
+    //     return -1;
+    // }
+    printf("$ ");
     return 0;
 }
 

@@ -35,6 +35,28 @@ struct file* filealloc(){
 }
 
 
+int filewrite(struct file *f,uint64 p,int n){
+    if(f->writable == 0){
+        return -1;
+    }
+    int ret = 0;
+    printf("f.type:%d\n",f->type);
+    if(f->type == FD_PIPE){
+        ret = 1;
+    }else if(f->type == FD_DEVICE){
+        if(f->major < 0 || f->major >= NDEV || !devsw[f->major].write){
+           return -1;
+        }
+        ret = devsw[f->major].write(1, p, n);
+    }else if(f->type == FD_INODE){
+
+    }else{
+
+    }
+    return ret;
+}
+
+
 struct  file* filedup(struct file* f){
     acquire(&filecache.slock);
     if(f->ref < 1){

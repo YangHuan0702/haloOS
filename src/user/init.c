@@ -5,15 +5,15 @@
 
 
 int main(){
-    printf("join init");
-    if(open("console",O_RDWR) < 0){
+    // printf("join init");
+    // if(open("console",O_RDWR) < 0){
 
-    }
-    dup(0);
-    dup(0);
+    // }
+    // dup(0);
+    // dup(0);
 
+    printf("\n");
     for(;;){
-        printf("init: starting sh\n");
     }
     return 0;
 }

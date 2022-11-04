@@ -1,7 +1,7 @@
 CC = riscv64-unknown-elf-gcc
 #CFLAGS = -nostdlib -fno-builtin -mcmodel=medany -march=rv32ima -mabi=ilp32
-CFLAGS = -Wall -Werror -O -fno-omit-frame-pointer -ggdb
-CFLAGS += -nostdlib -fno-builtin -mcmodel=medany -march=rv64g -fno-common -ffreestanding
+CFLAGS = -Wall -Werror -O -fno-omit-frame-pointer -ggdb -MD
+CFLAGS += -nostdlib -mcmodel=medany -fno-common -ffreestanding
 CFLAGS += $(shell $(CC) -fno-stack-protector -E -x c /dev/null >/dev/null 2>&1 && echo -fno-stack-protector)
 
 QEMU = qemu-system-riscv64

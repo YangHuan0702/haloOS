@@ -54,6 +54,7 @@ pagetable_t proc_pagetable(struct proc*);
 void init_filecache();
 struct file* filealloc();
 struct file* filedup(struct file*);
+int filewrite(struct file*,uint64,int);
 
 // memlayout.c
 void uart_putstr(char*);
