@@ -17,7 +17,7 @@ int consolewrite(int user_dst,uint64 src,int n){
     int i;
     for(i = 0; i< n;i++){
         char c;
-        if(either_copy(&c,0,src,1) == -1){
+        if(either_copy(&c,user_dst,src+i,1) == -1){
             break;
         }
         uart_putc(c);

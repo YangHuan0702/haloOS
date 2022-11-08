@@ -147,5 +147,6 @@ void freewalk(pagetable_t);
 pte_t* walk(pagetable_t,uint64,int);
 void uvmfree(pagetable_t,uint64);
 int copyinstr(pagetable_t,char*,uint64,uint64);
+int copyin(pagetable_t,void*,uint64,uint64);
 
 #define NELEM(x) (sizeof(x)/sizeof((x)[0]))

@@ -285,6 +285,26 @@ pagetable_t uvmcreate(){
     return pagetable;
 }
 
+int copyin(pagetable_t pagetable,void *dest,uint64 src,uint64 len){
+    uint64 n,va0,pa0;
+    while (len > 0) {
+        va0 = PGROUNDDOWN(src);
+        pa0 = walkaddr(pagetable,va0);
+        if(pa0 == 0){
+            return -1;
+        }
+        n = PGSIZE - (src + va0);
+        if(n > len){
+            n = len;
+        }
+        memmove(dest,(void*)(pa0 + (src - va0)),n);
+
+        len -= n;
+        dest += n;
+        src = va0 + PGSIZE;
+    }
+    return 0;
+}
 
 int copyinstr(pagetable_t pagetable,char *dst,uint64 va,uint64 max){
     int got_null = 0;

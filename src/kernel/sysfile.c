@@ -14,6 +14,7 @@ static int argfd(int n,int *pfd,struct file **fe){
         return -1;
     }
     if(fd < 0 || fd >= OPENFILE || (f = myproc()->openfs[fd]) == 0){
+        printf("n:%d,fd:%d,proc:%s\n",n,fd,myproc()->name);
         return -1;
     }
     if(pfd){

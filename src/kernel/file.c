@@ -40,7 +40,6 @@ int filewrite(struct file *f,uint64 p,int n){
         return -1;
     }
     int ret = 0;
-    printf("f.type:%d\n",f->type);
     if(f->type == FD_PIPE){
         ret = 1;
     }else if(f->type == FD_DEVICE){

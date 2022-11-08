@@ -1,6 +1,9 @@
 #include "type.h"
 #include "defs.h"
 #include "riscv.h"
+#include "spinlock.h"
+#include "file.h"
+#include "proc.h"
 
 uint copyout(int user_dst,uint64 dst,void *src,int n){
     if(user_dst){
@@ -43,9 +46,10 @@ int either_copyout(int user_dst,uint64 dst,void *src,uint64 len){
 }
 
 int either_copy(void *dst,int user_src,uint64 src,uint64 len) {
-    // struct proc *proc  = myproc();
+    struct proc *p  = myproc();
     if(user_src){
         // user -> kernel
+        return copyin(p->pagetable, dst, src, len);
     }else{
         memmove(dst,(char*)src,len);
         return 0;

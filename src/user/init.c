@@ -9,10 +9,10 @@ int main(){
         mknod("console",1,0);
         open("console",O_RDWR);
     }
-    printf("-------\n");
-    dup(0);
-    dup(0);
+    dup(0); // std out
+    dup(0); // std error
     for(;;){
+        printf("init: start sh...\n");
     }
     return 0;
 }
