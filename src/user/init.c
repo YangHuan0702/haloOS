@@ -5,14 +5,12 @@
 
 
 int main(){
-    // printf("join init");
-    // if(open("console",O_RDWR) < 0){
+    if(open("console",O_RDWR) < 0){
 
-    // }
-    // dup(0);
-    // dup(0);
-
-    printf("\n");
+    }
+    printf("-------\n");
+    dup(0);
+    dup(0);
     for(;;){
     }
     return 0;

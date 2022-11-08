@@ -284,3 +284,39 @@ pagetable_t uvmcreate(){
     memset(pagetable,0,PGSIZE);
     return pagetable;
 }
+
+
+int copyinstr(pagetable_t pagetable,char *dst,uint64 va,uint64 max){
+    int got_null = 0;
+    while (got_null == 0 && max > 0) {
+        uint64 va0 = PGROUNDDOWN(va);
+        uint64 pa0 = walkaddr(pagetable,va0);
+        if(pa0 == 0){
+            return -1;
+        }
+        uint64 n = PGSIZE - (va - va0);
+        if(n > max){
+            n = max;
+        }
+        char *p = (char*)(pa0 + (va - va0));
+        while(n > 0){
+            if(*p == '\0'){
+                *dst = '\0';
+                got_null = 1;
+                break;
+            } else {
+                *dst = *p;
+            }
+            --n;
+            --max;
+            p++;
+            dst++;
+        }
+        va = va0 + PGSIZE;
+    }
+    if(got_null){
+        return 0;
+    } else {
+        return -1;
+    }
+}

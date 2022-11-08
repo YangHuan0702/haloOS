@@ -28,12 +28,19 @@ int argaddr(int n,uint64 *addr){
 
 // TODO before need finish to Virtual Memory
 int getstr(uint64 addr,char *buf,int size){
-    return -1;
+    struct proc *p = myproc();
+    int err = copyinstr(p->pagetable, buf, addr, size);
+    if(err < 0){
+        return err;
+    }
+    return strlen(buf);
 }
 
 int argstr(int num,char *buf,int size){
     uint64 addr;
-    argaddr(num,&addr);
+    if(argaddr(num,&addr) < 0){
+        return -1;
+    }
     return getstr(addr,buf,size);
 }
 

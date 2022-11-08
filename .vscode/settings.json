@@ -18,7 +18,8 @@
         "stdarg.h": "c",
         "syscall.h": "c",
         "fcntl.h": "c",
-        "param.h": "c"
+        "param.h": "c",
+        "limits": "c"
     },
     "C_Cpp.errorSquiggles": "Disabled"
 }

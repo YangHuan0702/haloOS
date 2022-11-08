@@ -90,26 +90,17 @@ static struct inode* create(char *path,short type,short major,short minor){
 }
 
 uint64 sys_write() {
-    // struct file *f;
-    // int n;
-    // uint64 p;
-    // if(argfd(0,0,&f) < 0 || argint(2,&n) < 0 || argaddr(1,&p) < 0){
-    //     if(argfd(0,0,&f) < 0){
-    //         panic("argfd");
-    //     }
-    //     if(argint(2,&n) < 0){
-    //         panic("argint");
-    //     }
-    //     if(argaddr(1,&p) < 0){
-    //         panic("argaddr");
-    //     }
-    //     return -1;
-    // }
-    printf("$ ");
-    return 0;
+    struct file *f;
+    int n;
+    uint64 p;
+    if(argfd(0,0,&f) < 0 || argint(2,&n) < 0 || argaddr(1,&p) < 0){
+        return -1;
+    }
+    return filewrite(f,p,n);
 }
 
 uint64 sys_open(){
+    printf("join to sys_open\n");
     char path[MAXPATH];
     int fd,model;
     int n;
@@ -128,6 +119,7 @@ uint64 sys_open(){
     }else{
         ip = iname(path);
         if(ip == 0){
+            printf("ip == 0");
             return -1;
         }
     }
