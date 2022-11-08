@@ -27,6 +27,7 @@ struct {
 static void readsb(int dev,struct superblock *sb){
     struct buf *f = bread(dev,1);
     memmove(sb,f->data,sizeof(*sb));
+    brelease(f);
 }
 
 
@@ -108,9 +109,11 @@ static uint balloc(uint dev){
             int m = 1 << (bi % 8);
             if((bp->data[bi/8] & m) == 0){
                 bp->data[bi/8] |= m;
+                brelease(bp);
                 return b+bi;
             }
         }
+        brelease(bp);
     }
     panic("balloc panic...\n");
     return -1;
@@ -134,6 +137,7 @@ static uint bmap(struct inode* ip,uint n){
         if((addr = a[n]) == 0){
             a[n] = addr = balloc(ip->dev);
         }
+        brelease(bp);
         return addr;
     }
     panic("bmap panic...\n");
@@ -209,6 +213,7 @@ struct inode* iname(char *name){
     struct inode *dp = iget(ROOTDEV,ROOTINO);
     ilock(dp);
     i = inodeByName(dp,name);
+    sleep_unlock(&dp->splock);
     return i;
 }
 
@@ -347,8 +352,10 @@ struct inode* ialloc(uint dev,short type) {
         if(d->type == 0){
             memset(d,0,sizeof(*d));
             d->type = type;
+            brelease(bp);
             return iget(dev,inum);
         }
+        brelease(bp);
     }
     return 0;
 }
@@ -378,9 +385,11 @@ int writei(struct inode *ip,int user_src,uint64 src,uint off, uint n){
         struct buf *bp = bread(ip->dev,bmap(ip,off%BSIZE));
         m = min(n-tot,BSIZE - off % BSIZE);
         if(either_copy(bp->data+(off%BSIZE),user_src,src,m) != m){
+            brelease(bp);
             break;
         }
         // log
+        brelease(bp);
     }
     if(off > ip->size){
         ip->size = off;

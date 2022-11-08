@@ -6,7 +6,8 @@
 
 int main(){
     if(open("console",O_RDWR) < 0){
-
+        mknod("console",1,0);
+        open("console",O_RDWR);
     }
     printf("-------\n");
     dup(0);

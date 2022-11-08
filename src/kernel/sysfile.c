@@ -62,8 +62,8 @@ uint64 sys_dup(){
 
 static struct inode* create(char *path,short type,short major,short minor){
     struct inode *ip,*dp;
-    dp = iget(ROOTDEV,ROOTINO);
-
+    dp = rooti();
+    ilock(dp);
     if(*path == '/'){
         path++;
     }
@@ -75,6 +75,7 @@ static struct inode* create(char *path,short type,short major,short minor){
     if((ip = ialloc(dp->dev,type)) == 0){
         panic("fs.c create >> ialloc panic..\n");
     }
+    ilock(ip);
     ip->major = major;
     ip->minor = minor;
     ip->nlink = 1;
@@ -82,11 +83,26 @@ static struct inode* create(char *path,short type,short major,short minor){
 
     dp->nlink ++;
     iupdate(dp);
-    
+
     if(dirlink(dp,path,ip->inum) < 0){
         panic("create >> dirline panic...\n");
     }
+    iunlockput(dp);
     return ip;
+}
+
+uint64 sys_mknod(){
+    struct inode *ip;
+    char path[MAXPATH];
+    int major, minor;
+
+    if(argstr(0, path, MAXPATH) < 0 || argint(1, &major) < 0 || argint(2, &minor) < 0 ||
+        (ip = create(path, T_DEVICE, major, minor)) == 0){
+        panic("sys_mknod");
+        return -1;
+    }
+    iunlockput(ip);
+    return 0;
 }
 
 uint64 sys_write() {
@@ -100,7 +116,6 @@ uint64 sys_write() {
 }
 
 uint64 sys_open(){
-    printf("join to sys_open\n");
     char path[MAXPATH];
     int fd,model;
     int n;
@@ -119,7 +134,6 @@ uint64 sys_open(){
     }else{
         ip = iname(path);
         if(ip == 0){
-            printf("ip == 0");
             return -1;
         }
     }

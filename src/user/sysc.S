@@ -23,7 +23,12 @@ exec:
     ecall
     ret
 .global wait
+wait:
     li a7,SYS_WAIT
     ecall
     ret
-
+.global mknod
+mknod:
+    li a7,SYS_MKNOD
+    ecall
+    ret

@@ -10,6 +10,7 @@ extern uint64 sys_exec(void);
 extern uint64 sys_dup(void);
 extern uint64 sys_open(void);
 extern uint64 sys_wait(void);
+extern uint64 sys_mknod(void);
 
 static uint64 (*syscalls[])(void) = {
     [SYS_WRITE]     sys_write,
@@ -18,6 +19,7 @@ static uint64 (*syscalls[])(void) = {
     [SYS_DUP]       sys_dup,
     [SYS_OPEN]      sys_open,
     [SYS_WAIT]      sys_wait,
+    [SYS_MKNOD]     sys_mknod,
 };
 
 void syscall(){
