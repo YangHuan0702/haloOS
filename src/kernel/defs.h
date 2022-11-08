@@ -98,6 +98,8 @@ struct inode* rootsub(char*);
 void iunlockput(struct inode*);
 void iunlock(struct inode*);
 void iput(struct inode*);
+void bwrite(struct buf*);
+
 
 // print.c
 void printf(char*, ...);
@@ -124,7 +126,7 @@ char* memset(void*,int,int);
 void* memmove(void*,void*,int);
 int strncmp(const char*,const char*,int);
 char* safestrcpy(char*,const char*,int);
-
+char* strncpy(char*,const char*,int);
 
 // vm.c
 void kfree(void*);

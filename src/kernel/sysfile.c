@@ -81,8 +81,12 @@ static struct inode* create(char *path,short type,short major,short minor){
     ip->nlink = 1;
     iupdate(ip);
 
-    dp->nlink ++;
-    iupdate(dp);
+    if(type == T_DIR){
+        iupdate(dp);
+        if(dirlink(ip, ".", ip->inum) < 0 || dirlink(ip, "..", dp->inum) < 0){
+            panic("create dots");
+        }
+    }
 
     if(dirlink(dp,path,ip->inum) < 0){
         panic("create >> dirline panic...\n");
@@ -95,7 +99,6 @@ uint64 sys_mknod(){
     struct inode *ip;
     char path[MAXPATH];
     int major, minor;
-
     if(argstr(0, path, MAXPATH) < 0 || argint(1, &major) < 0 || argint(2, &minor) < 0 ||
         (ip = create(path, T_DEVICE, major, minor)) == 0){
         panic("sys_mknod");
@@ -134,9 +137,11 @@ uint64 sys_open(){
     }else{
         ip = iname(path);
         if(ip == 0){
+            printf("ip == 0 \n");
             return -1;
         }
     }
+    ilock(ip);
 
     if(ip->type == T_DEVICE && (ip->major < 0 || ip->major >= NDEV)){
         return -1;
@@ -158,5 +163,6 @@ uint64 sys_open(){
     f->ip = ip;
     f->readable = !(model & O_WRONLY);
     f->writable = (model & O_WRONLY) | (model & O_RDWR);
+    iunlock(ip);
     return fd;
 }

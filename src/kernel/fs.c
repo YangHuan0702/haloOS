@@ -252,6 +252,13 @@ void brelease(struct buf *b){
     release(&bcache.slock);
 }
 
+void bwrite(struct buf *b){
+    if(!holdingsleep(&b->sk)){
+        panic("bwrite");
+    }
+    virt_disk_rw(b,1);
+}
+
 void ilock(struct inode* i){
     struct buf *b;
     struct dinode *dip;
@@ -352,6 +359,7 @@ struct inode* ialloc(uint dev,short type) {
         if(d->type == 0){
             memset(d,0,sizeof(*d));
             d->type = type;
+            bwrite(bp);
             brelease(bp);
             return iget(dev,inum);
         }
@@ -370,25 +378,30 @@ void iupdate(struct inode *ip){
     dip->size = ip->size;
     memmove(dip->addrs, ip->addrs, sizeof(ip->addrs));
     // TODO : already write to cache buf , now should write to log 
+    bwrite(b);
     brelease(b);
 }
 
 int writei(struct inode *ip,int user_src,uint64 src,uint off, uint n){
     if(off > ip->size || off + n < off){
+        printf("off > ip->size || off + n < off \n");
         return -1;
     }
     if(off + n > MAXFILE){
+        printf("off + n > MAXFILE \n");
         return -1;
     }
     int tot,m;
     for(tot = 0; tot < n;tot += m,off += m,src += m){
-        struct buf *bp = bread(ip->dev,bmap(ip,off%BSIZE));
+        struct buf *bp = bread(ip->dev,bmap(ip,off/BSIZE));
         m = min(n-tot,BSIZE - off % BSIZE);
-        if(either_copy(bp->data+(off%BSIZE),user_src,src,m) != m){
+        if(either_copy(bp->data+(off%BSIZE),user_src,src,m) == -1){
             brelease(bp);
+            panic("writi:either_copy\n");
             break;
         }
         // log
+        bwrite(bp);
         brelease(bp);
     }
     if(off > ip->size){
@@ -397,6 +410,7 @@ int writei(struct inode *ip,int user_src,uint64 src,uint off, uint n){
     iupdate(ip);
     return tot;
 }
+
 
 int dirlink(struct inode *dp,char *path,short inum){
     struct dirent dir;
@@ -411,9 +425,10 @@ int dirlink(struct inode *dp,char *path,short inum){
         }
     }
 
-    strncmp(dir.name,path,DIRSIZ);
+    strncpy(dir.name,path,DIRSIZ);
     dir.inum = inum;
-
-    writei(dp,0,(uint64)&dir,off,sizeof(dir));
+    if(writei(dp,0,(uint64)&dir,off,sizeof(dir)) != sizeof(dir)){
+        panic("dirlink writei");
+    };
     return 0;
 }
