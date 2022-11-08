@@ -49,6 +49,7 @@ void proc_mapstacks(pagetable_t);
 void wakeup(void*);
 void yield();
 pagetable_t proc_pagetable(struct proc*);
+int fork();
 
 // file.c
 void init_filecache();
@@ -99,7 +100,7 @@ void iunlockput(struct inode*);
 void iunlock(struct inode*);
 void iput(struct inode*);
 void bwrite(struct buf*);
-
+struct inode* idup(struct inode*);
 
 // print.c
 void printf(char*, ...);
@@ -148,5 +149,6 @@ pte_t* walk(pagetable_t,uint64,int);
 void uvmfree(pagetable_t,uint64);
 int copyinstr(pagetable_t,char*,uint64,uint64);
 int copyin(pagetable_t,void*,uint64,uint64);
+int uvmcpy(pagetable_t,pagetable_t,uint64);
 
 #define NELEM(x) (sizeof(x)/sizeof((x)[0]))

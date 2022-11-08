@@ -50,6 +50,7 @@ int cpuid(){
 	return cpuid;
 }
 
+
 void wakeup(void *chan){
 	struct proc *p;
 	for(p = procs;p < procs+NPROC; p++){
@@ -278,3 +279,39 @@ void userinit(){
 }
 
 
+int fork(){
+	struct proc *now = myproc();
+	struct proc *p = allocproc();
+	if(p == 0){
+		return -1;
+	}
+	if(uvmcpy(now->pagetable,p->pagetable,now->sz) < 0){
+		freeproc(p);
+		release(&p->slock);
+		return -1;
+	}
+	p->sz = now->sz;
+	*(p->trapframe) = *(now->trapframe);
+
+	p->trapframe->a0 = 0;
+	for(int i = 0; i < OPENFILE; i++){
+		if(now->openfs[i]){
+			p->openfs[i] = filedup(now->openfs[i]);
+		}
+	}
+	p->pwd = idup(now->pwd);
+
+	safestrcpy(p->name,now->name,sizeof(now->name));
+	int pid = p->pid;
+
+	release(&p->slock);
+
+	acquire(&wait_lock);
+	p->parent = now;
+	release(&wait_lock);
+
+	acquire(&p->slock);
+	p->state = RUNNABLE;
+	release(&p->slock);
+	return pid;
+}

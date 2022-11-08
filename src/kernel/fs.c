@@ -31,6 +31,15 @@ static void readsb(int dev,struct superblock *sb){
 }
 
 
+struct inode* idup(struct inode *target){
+    acquire(&inodecache.slock);
+    target->ref++;
+    release(&inodecache.slock);
+    return target;
+}
+
+
+
 void initfs(int dev){
     readsb(dev,&sb);
     if(sb.magic != FSMAGIC){

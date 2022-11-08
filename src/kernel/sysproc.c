@@ -9,3 +9,8 @@ uint64 sys_wait(){
     }
     return wait(p);
 }
+
+
+uint64 sys_fork(){
+    return fork();
+}

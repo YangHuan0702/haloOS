@@ -167,6 +167,34 @@ freewalk(pagetable_t pagetable)
   kfree((void*)pagetable);
 }
 
+int uvmcpy(pagetable_t old,pagetable_t new,uint64 sz){
+    pte_t *pte;
+    uint64 pa,i;
+    uint flags;
+    char *mem;
+
+    for(i = 0; i < sz; i += PGSIZE) {
+        if((pte = walk(old,i,0)) == 0){
+            panic("uvmcpy walk\n");
+        }
+        if((*pte & PTE_V) == 0){
+            panic("uvmcpy: page not present\n");
+        }
+        pa = PTE2PA(*pte);
+        flags = PTE_FLAGS(*pte);
+        if((mem = kalloc()) == 0){
+            panic("uvmcpy: kalloc\n");
+        }
+        memmove(mem,(char*)pa,PGSIZE);
+        if(mappages(new,i,PGSIZE,(uint64)mem,flags) != 0){
+            kfree(mem);
+            panic("uvmcpy mappages\n");
+        }
+    }
+    return 0;
+}
+
+
 void proc_freepagetable(pagetable_t pagetable, uint64 sz)
 {
   uvmunmap(pagetable, TRAMPOLINE, 1, 0);
