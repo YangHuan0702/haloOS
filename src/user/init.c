@@ -3,6 +3,7 @@
 #include "src/kernel/fcntl.h"
 #include "src/user/users.h"
 
+char *argv[] = {"sh",0};
 
 int main(){
     if(open("console",O_RDWR) < 0){
@@ -11,8 +12,28 @@ int main(){
     }
     dup(0); // std out
     dup(0); // std error
+
+    int pid,wpid;
     for(;;){
         printf("init: start sh...\n");
+        pid = fork();
+        if(pid < 0){
+            printf("init: fork failed\n");
+        }
+        if(pid == 0){
+            exec("sh",argv);
+            printf("init: exec sh failed\n");
+        }  
+        for(;;){
+            wpid = wait((int *) 0);
+            if(wpid == pid){
+                break;
+            }else if(wpid < 0){
+                printf("init: wait returned an error\n");
+            }else{
+
+            }
+        }
     }
     return 0;
 }

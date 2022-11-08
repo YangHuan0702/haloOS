@@ -140,6 +140,12 @@ int wait(uint64 addr){
 				havekids = 1;
 				if(np->state == ZOMBIE){
 					pid = np->pid;
+					if(addr != 0 && copyoutpg(p->pagetable, addr, (char *)&np->xstate,
+                                  sizeof(np->xstate)) < 0) {
+						release(&np->slock);
+						release(&wait_lock);
+						return -1;
+					}
 					freeproc(np);
 					release(&np->slock);
 					release(&wait_lock);

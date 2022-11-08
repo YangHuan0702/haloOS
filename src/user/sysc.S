@@ -32,3 +32,8 @@ mknod:
     li a7,SYS_MKNOD
     ecall
     ret
+.global fork
+fork:
+    li a7,SYS_FORK
+    ecall
+    ret

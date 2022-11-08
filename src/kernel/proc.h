@@ -68,10 +68,10 @@ struct proc {
   enum procstate state;
 
   struct spinlock slock;
-
   char name[16];
   uint pid;
   int killed;
+  int xstate;
   struct proc *parent;
 
   uint64 kstack;
