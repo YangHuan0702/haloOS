@@ -166,7 +166,7 @@ int readi(struct inode* ip,int user_dst,uint64 dst,uint off,uint n){
     for(tot = 0; tot < n; tot+=m,dst+=m){
         b = bread(ip->dev,bmap(ip,off/BSIZE));
         m = min(n - tot,BSIZE - off % BSIZE);
-        if(copyout(user_dst,dst,b->data + (off % BSIZE),m) == -1){
+        if(either_copyout(user_dst,dst,b->data + (off % BSIZE),m) == -1){
             tot = -1;
             brelease(b);
             break;
@@ -192,7 +192,7 @@ struct inode* iget(uint dev,uint inum){
         }
     }
     if(r == 0){
-        panic("getInodeByDevAndINum panic");
+        panic("iget panic");
     }
     i = r;
     i->dev = dev;

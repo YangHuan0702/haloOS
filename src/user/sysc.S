@@ -37,3 +37,8 @@ fork:
     li a7,SYS_FORK
     ecall
     ret
+.global read
+read:
+    li a7,SYS_READ
+    ecall
+    ret

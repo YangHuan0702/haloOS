@@ -38,10 +38,12 @@ OBJS = \
 		 src/kernel/trampoline.o \
 		 src/kernel/vm.o \
 
+-include src/kernel/*.d src/user/*.d
 
 USERS = \
 		src/user/_ls\
 		src/user/_init\
+		src/user/_sh\
 
 .PRECIOUS: %.o
 
@@ -69,7 +71,7 @@ LD = riscv64-unknown-elf-ld
 
 LDFLAGS = -z max-page-size=4096
 
-ULIB = src/user/sysc.o src/user/printf.o 
+ULIB = src/user/sysc.o src/user/printf.o src/user/str.o
 
 _%: %.o $(ULIB)
 	$(LD) $(LDFLAGS) -N -e main -Ttext 0 -o $@ $^
@@ -125,4 +127,4 @@ clean:
 	rm -f *.elf src/kernel/*.o src/kernel/kernel src/kernel/kernel.asm src/kernel/kernel.sym
 	rm -f src/user/*.o src/user/*.sym src/user/*.asm $(USERS)
 	rm -rf src/user/initcode src/user/*.out
-	rm -rf src/kernel/*.d
+	rm -rf src/kernel/*.d src/user/*.d

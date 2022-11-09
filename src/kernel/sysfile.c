@@ -5,7 +5,19 @@
 #include "fcntl.h"
 #include "proc.h"
 #include "stat.h"
+#include "param.h"
 
+
+int fetchaddr(uint64 addr,uint64 *ip){
+    struct proc *p = myproc();
+    if(addr >= p->sz || addr+sizeof(uint64) > p->sz){
+        return -1;
+    }
+    if(copyin(p->pagetable, (char *)ip, addr, sizeof(*ip)) != 0){
+        return -1;
+    }
+    return 0;
+}
 
 static int argfd(int n,int *pfd,struct file **fe){
     int fd;
@@ -40,10 +52,23 @@ static int fdalloc(struct file *f){
     return -1;
 }
 
+uint64 sys_read(){
+    int sz;
+    uint64 p;
+    struct file *f;
+    if(argfd(0,0,&f) < 0 || argint(2,&sz) < 0 || argaddr(1,&p) < 0){
+        panic("sys_read param failure\n");
+    }
+    return fileread(f,p,sz);
+}
 
 uint64 sys_exec(){
-    char *path = "/init";
-    int ret = exec(path,0);
+    char name[MAXPATH];
+    if(argstr(0,name,MAXPATH) < 0){
+        return -1;
+    };
+    printf("exec:%s\n",name);
+    int ret = exec(name,0);
     return ret;
 }
 

@@ -77,4 +77,3 @@ void printf(char *s,...){
         }
     }
 }
-

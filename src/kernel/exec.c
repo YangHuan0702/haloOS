@@ -27,10 +27,12 @@ static int loadseg(pagetable_t pagetable,uint64 va,struct inode *ip,struct progh
 }
 
 int exec(char *path,char** argv){
-    path+=1;
+    if(*path == '/'){
+        path+=1;
+    }
     struct inode *app = rootsub(path);
     ilock(app);
-    struct proc *p = myproc();
+    struct proc *p = myproc(); 
 
     pagetable_t pagetable = proc_pagetable(p);
     if(pagetable == 0){

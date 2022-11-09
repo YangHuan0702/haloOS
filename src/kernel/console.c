@@ -4,13 +4,16 @@
 #include "spinlock.h"
 #include "proc.h"
 
+
 #define C(x)  ((x)-'@')  // Control-x
 #define INPUT_MAX 128
+#define BACKSPACE 0x100
 struct {
     struct spinlock slock;
     char buf[INPUT_MAX];
     uint r;
     uint w;
+    uint e;
 } cons;
 
 int consolewrite(int user_dst,uint64 src,int n){
@@ -20,7 +23,7 @@ int consolewrite(int user_dst,uint64 src,int n){
         if(either_copy(&c,user_dst,src+i,1) == -1){
             break;
         }
-        uart_putc(c);
+        uartputc(c);
     }
     return i;
 }
@@ -35,17 +38,15 @@ int consoleread(int user_dst,uint64 dst,int n){
                 release(&cons.slock);
                 return -1;
             }
-            // sleep(&cons.r, &cons.slock);
+            sleep(&cons.r, &cons.slock);
         }
-        
-        char c = cons.buf[cons.r % INPUT_MAX];
+        char c = cons.buf[cons.r++ % INPUT_MAX];
         if(c == C('D')){
             if(n < target){
                 cons.r --;
             }
             break;
         }
-
         char cbuf = c;
         if(either_copyout(user_dst, dst, &cbuf, 1) == -1){
             break;
@@ -66,4 +67,46 @@ void consoleinit(){
 
     devsw[CONSOLE].read = consoleread;
     devsw[CONSOLE].write = consolewrite;
+}
+
+void consputc(int c){
+    if(c == BACKSPACE){
+        uartputc_sync('\b');
+        uartputc_sync(' ');
+        uartputc_sync('\b');
+    }else{
+        uartputc_sync(c);
+    }
+}
+
+void consoleintr(int c){
+    acquire(&cons.slock);
+    switch (c) {
+    case C('U'):
+        while(cons.e != cons.w &&
+          cons.buf[(cons.e-1) % INPUT_MAX] != '\n'){
+            cons.e--;
+            consputc(BACKSPACE);
+        }
+        break;
+    case C('H'):
+    case '\x7f':
+        if(cons.e != cons.w){
+            cons.e--;
+            consputc(BACKSPACE);
+        }
+        break;
+    default:
+        if(c != 0 && cons.e - cons.r < INPUT_MAX){
+            c = (c == '\r') ? '\n' : c;
+            consputc(c);
+            cons.buf[cons.e++ % INPUT_MAX] = c;
+            if((c == '\n' || c == C('D')) || cons.e == cons.r + INPUT_MAX){
+                cons.w = cons.e;
+                wakeup(&cons.r);
+            }
+        }
+        break;
+    }
+    release(&cons.slock);
 }

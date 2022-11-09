@@ -8,13 +8,38 @@
 #define CMD_BUFF 128
 
 extern volatile int panicked;
+struct spinlock uart_tx_lock;
 
-void uart_putc(char c){
+#define UART_TX_BUF_SIZE 32
+char uart_tx_buf[UART_TX_BUF_SIZE];
+uint64 uart_tx_w;
+uint64 uart_tx_r;
+
+void uartstart();
+
+
+
+void uartputc(char c){
+  acquire(&uart_tx_lock);
   if(panicked){
       for(;;){}
   }
-    while ((ReadReg(LSR) & LM5) == 0){}
-    WriteReg(THR,c);
+  
+  while (1) {
+    if(uart_tx_w == uart_tx_r + UART_TX_BUF_SIZE){
+        sleep(&uart_tx_r,&uart_tx_lock);
+    }else{
+      uart_tx_buf[uart_tx_w % UART_TX_BUF_SIZE] = c;
+      uart_tx_w += 1;
+      uartstart();
+      release(&uart_tx_lock);
+      return;
+    }
+  }
+}
+
+void uart_putc(char c){
+  uartputc_sync(c);
 }
 
 void uart_putstr(char* s){
@@ -46,7 +71,7 @@ void uartinit(){
   // 启用发送和接收中断
   WriteReg(IER, IER_TX_ENABLE | IER_RX_ENABLE);
 
-//   initlock(&uart_tx_lock, "uart");
+  initlock(&uart_tx_lock, "uart");
 }
 
 int uartgetc() {
@@ -58,35 +83,51 @@ int uartgetc() {
   }
 }
 
-#define CMD_BUFF 128
-char cmd[CMD_BUFF];
 struct{
   char* name;
   struct spinlock lock;
 } plic_lock;
 
-volatile int shellProcessored = 0;
+
+void uartstart(){
+  while (1) {
+    if(uart_tx_r == uart_tx_w){
+      return;
+    }
+
+    if((ReadReg(LSR) & LSR_TX_IDLE) == 0){
+        // UART 发送保持寄存器已满，当它准备好接收一个新字节时它会中断
+        return;
+    }
+    
+    int c = uart_tx_buf[uart_tx_r % UART_TX_BUF_SIZE];
+    uart_tx_r+=1;
+    wakeup(&uart_tx_r);
+    WriteReg(THR, c);
+  }
+}
+
+void uartputc_sync(int c){
+  push_off();
+  if(panicked){
+    for (;;){
+    }
+  }
+  while ((ReadReg(LSR) & LSR_TX_IDLE) == 0){
+  }
+  WriteReg(THR,c);  
+  pop_off();
+}
 
 void uartinterrupt(){
-    shellProcessored = 1;
-    int index = 0;
     for(;;){
       int c = uartgetc();
       if(c == -1){
           break;
       }
-      if(c == '\n'){
-        shellProcessored = 0;
-        break;
-      }
-      cmd[index] = c;
+      consoleintr(c);
     }
-}
-
-char* getCmd(){
-  return cmd;
-}
-
-int getShellResult(){
-  return shellProcessored;
+    acquire(&uart_tx_lock);
+    uartstart();
+    release(&uart_tx_lock);
 }

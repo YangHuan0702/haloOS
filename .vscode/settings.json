@@ -19,7 +19,8 @@
         "syscall.h": "c",
         "fcntl.h": "c",
         "param.h": "c",
-        "limits": "c"
+        "limits": "c",
+        "typeinfo": "c"
     },
     "C_Cpp.errorSquiggles": "Disabled"
 }

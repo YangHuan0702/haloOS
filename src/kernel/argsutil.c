@@ -16,7 +16,9 @@ static uint64 argptr(int num){
     case 3:
         return proc->trapframe->a3;
     case 4:
-        return proc->trapframe->a4;         
+        return proc->trapframe->a4;
+    case 5:
+        return proc->trapframe->a5;  
     }
     return -1;
 }
@@ -26,7 +28,6 @@ int argaddr(int n,uint64 *addr){
     return *addr;
 }
 
-// TODO before need finish to Virtual Memory
 int getstr(uint64 addr,char *buf,int size){
     struct proc *p = myproc();
     int err = copyinstr(p->pagetable, buf, addr, size);

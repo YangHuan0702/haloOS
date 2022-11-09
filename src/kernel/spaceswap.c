@@ -5,16 +5,6 @@
 #include "file.h"
 #include "proc.h"
 
-uint copyout(int user_dst,uint64 dst,void *src,int n){
-    if(user_dst){
-        // copyout to user space
-        return 0;
-    }else{
-        memmove((char*) dst,src,n);
-        return 0;
-    }
-}
-
 int copyoutpg(pagetable_t pagetable,uint64 dstva,char *src,uint64 len){
     while (len > 0) {
         uint64 va0 = PGROUNDDOWN(dstva);
@@ -35,9 +25,10 @@ int copyoutpg(pagetable_t pagetable,uint64 dstva,char *src,uint64 len){
 }
 
 int either_copyout(int user_dst,uint64 dst,void *src,uint64 len){
-    // struct proc *p = myproc();
+    struct proc *p = myproc();
     if(user_dst){
         // kernel -> user
+        return copyoutpg(p->pagetable, dst, src, len);
     }else{
         memmove((char*)dst,src,len);
         return 0;

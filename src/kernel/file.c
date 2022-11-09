@@ -55,6 +55,20 @@ int filewrite(struct file *f,uint64 p,int n){
     return ret;
 }
 
+int fileread(struct file *f,uint64 p,int n){
+    if(f->readable == 0){
+        return -1;
+    }
+    int ret = 0;
+    if(f->type == T_DEVICE){
+        if(f->major < 0 || f->major >= NDEV || !devsw[f->major].read){
+            return -1;
+        }
+        ret = devsw[f->major].read(1,p,n);
+    }
+    return ret;
+}
+
 
 struct  file* filedup(struct file* f){
     acquire(&filecache.slock);

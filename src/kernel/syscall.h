@@ -6,3 +6,4 @@
 #define SYS_MKNOD   6
 #define SYS_EXEC2   7 
 #define SYS_FORK    8
+#define SYS_READ    9

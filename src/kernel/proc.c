@@ -253,11 +253,17 @@ static struct proc* allocproc(){
 
 			if((p->trapframe = (struct trapframe*)kalloc()) == 0){
 				panic("alloc p->trapframe panic...\n");
+				freeproc(p);
+   				release(&p->slock);
+				return 0;
 			}
 
 			p->pagetable = proc_pagetable(p);
 			if(p->pagetable == 0){
+				freeproc(p);
+   				release(&p->slock);
 				panic("alloproc proc_pagetable alloced panic");
+				return 0;
 			}
 			memset(&p->cont,0,sizeof(p->cont));
 			p->cont.ra = (uint64) forkret;
@@ -291,7 +297,7 @@ int fork(){
 	if(p == 0){
 		return -1;
 	}
-	if(uvmcpy(now->pagetable,p->pagetable,now->sz) < 0){
+	if(uvmcopy(now->pagetable,p->pagetable,now->sz) < 0){
 		freeproc(p);
 		release(&p->slock);
 		return -1;

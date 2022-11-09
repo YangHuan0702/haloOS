@@ -50,12 +50,14 @@ void wakeup(void*);
 void yield();
 pagetable_t proc_pagetable(struct proc*);
 int fork();
+int either_copyin(void*, int, uint64, uint64);
 
 // file.c
 void init_filecache();
 struct file* filealloc();
 struct file* filedup(struct file*);
 int filewrite(struct file*,uint64,int);
+int fileread(struct file*,uint64,int);
 
 // memlayout.c
 void uart_putstr(char*);
@@ -63,8 +65,8 @@ void uart_putc(char);
 void uartinit();
 int uartgetc();
 void uartinterrupt();
-char* getCmd();
-int getShellResult();
+void uartputc_sync(int);
+void uartputc(char);
 
 // plic.c
 int plic_claim();
@@ -78,6 +80,7 @@ void usertrapret();
 
 // console.c
 void consoleinit();
+void consoleintr(int);
 
 // fs.c
 struct inode* rooti();
@@ -116,7 +119,6 @@ void virt_disk_rw(struct buf*,int);
 void virtio_disk_isr();
 
 // spaceswap.c
-uint copyout(int,uint64,void*,int);
 int either_copy(void*,int,uint64,uint64);
 int either_copyout(int,uint64,void*,uint64);
 int strlen(const char*);
@@ -149,8 +151,9 @@ void freewalk(pagetable_t);
 pte_t* walk(pagetable_t,uint64,int);
 void uvmfree(pagetable_t,uint64);
 int copyinstr(pagetable_t,char*,uint64,uint64);
-int copyin(pagetable_t,void*,uint64,uint64);
+int copyin(pagetable_t,char*,uint64,uint64);
 int uvmcpy(pagetable_t,pagetable_t,uint64);
+int uvmcopy(pagetable_t, pagetable_t, uint64);
 
 
 #define NELEM(x) (sizeof(x)/sizeof((x)[0]))
