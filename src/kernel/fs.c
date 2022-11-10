@@ -404,7 +404,7 @@ int writei(struct inode *ip,int user_src,uint64 src,uint off, uint n){
     for(tot = 0; tot < n;tot += m,off += m,src += m){
         struct buf *bp = bread(ip->dev,bmap(ip,off/BSIZE));
         m = min(n-tot,BSIZE - off % BSIZE);
-        if(either_copy(bp->data+(off%BSIZE),user_src,src,m) == -1){
+        if(either_copyin(bp->data+(off%BSIZE),user_src,src,m) == -1){
             brelease(bp);
             panic("writi:either_copy\n");
             break;

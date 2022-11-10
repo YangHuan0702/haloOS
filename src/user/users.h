@@ -1,6 +1,6 @@
 
 // system call
-int write(int,char*,int);
+int write(int,void*,int);
 int open(char*,int);
 int dup(int);
 int mknod(char*,int,int);

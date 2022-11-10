@@ -50,7 +50,7 @@ int filewrite(struct file *f,uint64 p,int n){
     }else if(f->type == FD_INODE){
 
     }else{
-
+        panic("filewrite");
     }
     return ret;
 }

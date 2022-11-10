@@ -25,16 +25,17 @@ static uint64 argptr(int num){
 
 int argaddr(int n,uint64 *addr){
     *addr = argptr(n);
-    return *addr;
+    return 0;
 }
 
-int getstr(uint64 addr,char *buf,int size){
-    struct proc *p = myproc();
-    int err = copyinstr(p->pagetable, buf, addr, size);
-    if(err < 0){
-        return err;
-    }
-    return strlen(buf);
+int fetchstr(uint64 addr, char *buf, int max) {
+  struct proc *p = myproc();
+  int err = copyinstr(p->pagetable, buf, addr, max);
+  if(err < 0){
+    panic("fetchstr err < 0");
+    return err;
+  }
+  return strlen(buf);
 }
 
 int argstr(int num,char *buf,int size){
@@ -42,7 +43,7 @@ int argstr(int num,char *buf,int size){
     if(argaddr(num,&addr) < 0){
         return -1;
     }
-    return getstr(addr,buf,size);
+    return fetchstr(addr,buf,size);
 }
 
 int argint(int n,int *ip){

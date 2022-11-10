@@ -34,6 +34,7 @@ int exec(char*,char**);
 int argaddr(int,uint64*);
 int argstr(int,char*,int);
 int argint(int,int*);
+int fetchstr(uint64, char*, int);
 
 // proc.c
 struct cpu* mycpu();
@@ -50,7 +51,7 @@ void wakeup(void*);
 void yield();
 pagetable_t proc_pagetable(struct proc*);
 int fork();
-int either_copyin(void*, int, uint64, uint64);
+
 
 // file.c
 void init_filecache();
@@ -119,8 +120,8 @@ void virt_disk_rw(struct buf*,int);
 void virtio_disk_isr();
 
 // spaceswap.c
-int either_copy(void*,int,uint64,uint64);
 int either_copyout(int,uint64,void*,uint64);
+int either_copyin(void*, int, uint64, uint64);
 int strlen(const char*);
 int copyoutpg(pagetable_t,uint64,char*,uint64);
 

@@ -86,13 +86,13 @@ QEMUOPTS = -machine virt -bios none -kernel src/kernel/kernel -m 128M -smp $(CPU
 QEMUOPTS += -drive file=fs.img,if=none,format=raw,id=x0
 QEMUOPTS += -device virtio-blk-device,drive=x0,bus=virtio-mmio-bus.0
 
-initcode: src/user/initcode.S
+user/initcode: src/user/initcode.S
 	$(CC) $(CFLAGS) -march=rv64g -nostdinc -I. -Ikernel -c src/user/initcode.S -o src/user/initcode.o
 	$(LD) $(LDFLAGS) -N -e start -Ttext 0 -o src/user/initcode.out src/user/initcode.o
 	$(OBJCOPY) -S -O binary src/user/initcode.out src/user/initcode
 	$(OBJDUMP) -S src/user/initcode.o > src/user/initcode.asm
 
-kernel: $(OBJS) src/kernel/os.ld fs.img initcode
+kernel: $(OBJS) src/kernel/os.ld fs.img user/initcode
 	$(LD) -z max-page-size=4096 -T src/kernel/os.ld -o src/kernel/kernel $(OBJS)
 	$(OBJDUMP) -S src/kernel/kernel > src/kernel/kernel.asm 
 	$(OBJDUMP) -t src/kernel/kernel | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$$/d' > src/kernel/kernel.sym

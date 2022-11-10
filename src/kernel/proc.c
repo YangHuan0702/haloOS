@@ -54,11 +54,13 @@ int cpuid(){
 void wakeup(void *chan){
 	struct proc *p;
 	for(p = procs;p < procs+NPROC; p++){
-		acquire(&p->slock);
-		if(p->state == SLEEPING && p->chan == chan){
-			p->state = RUNNABLE;
+		if(p != myproc()){
+			acquire(&p->slock);
+			if(p->state == SLEEPING && p->chan == chan){
+				p->state = RUNNABLE;
+			}
+			release(&p->slock);
 		}
-		release(&p->slock);
 	}
 }
 
@@ -81,11 +83,9 @@ void initproc(){
 	initlock(&pid_lock, "nextpid");
   	initlock(&wait_lock, "wait_lock");	
 	
-	int i = 0;
 	for(p = procs; p < &procs[NPROC]; p++){
 		initlock(&p->slock,"proc");
 		p->kstack = KSTACK((int) (p - procs));
-		i++;		
 	}
 }
 
@@ -101,6 +101,7 @@ int allocpid(){
 static void freeproc(struct proc *p){
 	if(p->trapframe){
 		// kfree
+		kfree(p->trapframe);
 	}
 	p->trapframe = 0;
 	p->pid = 0;
@@ -230,12 +231,17 @@ pagetable_t proc_pagetable(struct proc *p){
 	pagetable_t pagetable;
 
 	pagetable = uvmcreate();
+	if(pagetable == 0){
+		panic("proc_pagetable: uvmcreate");
+	}
 	if(mappages(pagetable, TRAMPOLINE, PGSIZE,(uint64)trampoline, PTE_R | PTE_X) < 0){
+		panic("------proc_pagetable : trampoline");
 		uvmfree(pagetable, 0);
     	return 0;
 	}
 
 	if(mappages(pagetable, TRAPFRAME, PGSIZE,(uint64)(p->trapframe), PTE_R | PTE_W) < 0){
+		panic("------proc_pagetable : p->trapframe");
 		uvmfree(pagetable, 0);
     	return 0;
 	};
@@ -280,12 +286,14 @@ void userinit(){
 	initp = p;
 
 	uvminit(p->pagetable, initcode, sizeof(initcode));
-	
 	p->sz = PGSIZE;
+
 	p->trapframe->epc = 0;
 	p->trapframe->sp = PGSIZE;
+	
 	safestrcpy(p->name,"initcode",sizeof(p->name));
 	p->pwd = rooti();
+
 	p->state = RUNNABLE;
 	release(&p->slock);	
 }

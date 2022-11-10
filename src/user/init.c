@@ -3,6 +3,8 @@
 #include "src/kernel/fcntl.h"
 #include "src/user/users.h"
 
+char *argv[] = { "sh", 0 };
+
 int main(){
     if(open("console",O_RDWR) < 0){
         mknod("console",1,0);
@@ -10,16 +12,15 @@ int main(){
     }
     dup(0); // std out
     dup(0); // std error
-
-    int pid =0,wpid;
+    int pid = 0,wpid;
     for(;;){
-        printf("init: start sh...\n");
+        printf("init: starting sh\n");
         pid = fork();
         if(pid < 0){
             printf("init: fork failed\n");
         }
         if(pid == 0){
-            exec("ls",0);
+            exec("/ls",argv);
         } 
         for(;;){
             wpid = wait((int *) 0);

@@ -5,23 +5,24 @@
 #include "file.h"
 #include "proc.h"
 
-int copyoutpg(pagetable_t pagetable,uint64 dstva,char *src,uint64 len){
-    while (len > 0) {
-        uint64 va0 = PGROUNDDOWN(dstva);
-        uint64 pa0 = walkaddr(pagetable, va0);
-        if(pa0 == 0){
-            return -1;
-        }
-        uint64 n = PGSIZE - (dstva - va0);
-        if(n > len){
-            n = len;
-        }
-        memmove((void *)(pa0 + (dstva - va0)), src, n);
-        len -= n;
-        src += n;
-        dstva = va0 + PGSIZE;
-    }
-    return 0;
+int copyoutpg(pagetable_t pagetable, uint64 dstva, char *src, uint64 len) {
+  uint64 n, va0, pa0;
+
+  while(len > 0){
+    va0 = PGROUNDDOWN(dstva);
+    pa0 = walkaddr(pagetable, va0);
+    if(pa0 == 0)
+      return -1;
+    n = PGSIZE - (dstva - va0);
+    if(n > len)
+      n = len;
+    memmove((void *)(pa0 + (dstva - va0)), src, n);
+
+    len -= n;
+    src += n;
+    dstva = va0 + PGSIZE;
+  }
+  return 0;
 }
 
 int either_copyout(int user_dst,uint64 dst,void *src,uint64 len){
@@ -36,7 +37,7 @@ int either_copyout(int user_dst,uint64 dst,void *src,uint64 len){
     return -1;
 }
 
-int either_copy(void *dst,int user_src,uint64 src,uint64 len) {
+int either_copyin(void *dst,int user_src,uint64 src,uint64 len) {
     struct proc *p  = myproc();
     if(user_src){
         // user -> kernel

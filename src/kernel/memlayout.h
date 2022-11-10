@@ -28,6 +28,7 @@
 
 // ------------------------------------- UART -----------------------------
 #define UART      0x10000000L
+#define UART0     0x10000000L
 #define UART0_IRQ 10
 
 #define Reg(reg)    (volatile unsigned char *)(UART + reg)
