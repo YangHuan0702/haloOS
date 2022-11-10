@@ -12,7 +12,7 @@ int main(){
     }
     dup(0); // std out
     dup(0); // std error
-    int pid = 0,wpid;
+    int pid = 0;
     for(;;){
         printf("init: starting sh\n");
         pid = fork();
@@ -20,17 +20,17 @@ int main(){
             printf("init: fork failed\n");
         }
         if(pid == 0){
-            exec("/ls",argv);
+            exec("/sh",argv);
         } 
         for(;;){
-            wpid = wait((int *) 0);
-            if(wpid == pid){
-                break;
-            }else if(wpid < 0){
-                printf("init: wait returned an error\n");
-            }else{
+            // wpid = wait((int *) 0);
+            // if(wpid == pid){
+            //     break;
+            // }else if(wpid < 0){
+            //     printf("init: wait returned an error\n");
+            // }else{
 
-            }
+            // }
         }
     }
     return 0;

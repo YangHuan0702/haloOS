@@ -62,59 +62,59 @@ uint64 sys_read(){
     return fileread(f,p,sz);
 }
 
-// uint64 sys_exec(){
-//     char name[MAXPATH];
-//     if(argstr(0,name,MAXPATH) < 0) {
-//         return -1;
-//     };
-//     printf("exec: %s,p.name:%s,p.id:%d\n",name,myproc()->name,myproc()->pid);
-//     int ret = exec(name,0);
-//     return ret;
-// }
-
-uint64
-sys_exec() {
-  char path[MAXPATH], *argv[MAXARG];
-  int i;
-  uint64 uargv, uarg;
-
-  if(argstr(0, path, MAXPATH) < 0 || argaddr(1, &uargv) < 0){
-    return -1;
-  }
-  memset(argv, 0, sizeof(argv));
-  for(i=0;; i++){
-    if(i >= NELEM(argv)){
-      goto bad;
-    }
-    if(fetchaddr(uargv+sizeof(uint64)*i, (uint64*)&uarg) < 0){
-        printf("fetchaddr r < 0");
-        goto bad;
-    }
-    if(uarg == 0){
-      argv[i] = 0;
-      break;
-    }
-    argv[i] = kalloc();
-    if(argv[i] == 0)
-      goto bad;
-    if(fetchstr(uarg, argv[i], PGSIZE) < 0){
-        panic("exec:fetchstr");
-        goto bad;
-    }
-  }
-  printf("exec: %s,p.name:%s,p.id:%d\n",path,myproc()->name,myproc()->pid);
-  int ret = exec(path, argv);
-
-  for(i = 0; i < NELEM(argv) && argv[i] != 0; i++)
-    kfree(argv[i]);
-
-  return ret;
-
- bad:
-  for(i = 0; i < NELEM(argv) && argv[i] != 0; i++)
-    kfree(argv[i]);
-  return -1;
+uint64 sys_exec(){
+    char name[MAXPATH];
+    if(argstr(0,name,MAXPATH) < 0) {
+        return -1;
+    };
+    printf("exec: %s,p.name:%s,p.id:%d\n",name,myproc()->name,myproc()->pid);
+    int ret = exec(name,0);
+    return ret;
 }
+
+// uint64
+// sys_exec() {
+//   char path[MAXPATH], *argv[MAXARG];
+//   int i;
+//   uint64 uargv, uarg;
+
+//   if(argstr(0, path, MAXPATH) < 0 || argaddr(1, &uargv) < 0){
+//     return -1;
+//   }
+//   memset(argv, 0, sizeof(argv));
+//   for(i=0;; i++){
+//     if(i >= NELEM(argv)){
+//       goto bad;
+//     }
+//     if(fetchaddr(uargv+sizeof(uint64)*i, (uint64*)&uarg) < 0){
+//         printf("fetchaddr r < 0");
+//         goto bad;
+//     }
+//     if(uarg == 0){
+//       argv[i] = 0;
+//       break;
+//     }
+//     argv[i] = kalloc();
+//     if(argv[i] == 0)
+//       goto bad;
+//     if(fetchstr(uarg, argv[i], PGSIZE) < 0){
+//         panic("exec:fetchstr");
+//         goto bad;
+//     }
+//   }
+//   printf("exec: %s,p.name:%s,p.id:%d\n",path,myproc()->name,myproc()->pid);
+//   int ret = exec(path, argv);
+
+//   for(i = 0; i < NELEM(argv) && argv[i] != 0; i++)
+//     kfree(argv[i]);
+
+//   return ret;
+
+//  bad:
+//   for(i = 0; i < NELEM(argv) && argv[i] != 0; i++)
+//     kfree(argv[i]);
+//   return -1;
+// }
 
 
 
