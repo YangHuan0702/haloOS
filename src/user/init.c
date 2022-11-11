@@ -19,7 +19,7 @@ int main(){
         if(pid < 0){
             printf("init: fork failed\n");
         }
-        if(pid == 0){
+        if(pid == 0) {
             exec("/sh",argv);
             printf("--------init exec sh panic-------\n");
             exit(1);

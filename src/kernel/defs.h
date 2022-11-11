@@ -52,6 +52,7 @@ void yield();
 pagetable_t proc_pagetable(struct proc*);
 int fork();
 void exit(int);
+void procdump();
 
 
 // file.c
@@ -70,6 +71,7 @@ int uartgetc();
 void uartinterrupt();
 void uartputc_sync(int);
 void uartputc(char);
+void consputc(int);
 
 // plic.c
 int plic_claim();

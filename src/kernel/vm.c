@@ -50,12 +50,14 @@ void* kalloc(void)
 
   acquire(&kmem.lk);
   r = kmem.freelist;
-  if(r)
+  if(r){
     kmem.freelist = r->next;
+  }
   release(&kmem.lk);
 
-  if(r)
-    memset((char*)r, 5, PGSIZE); // fill with junk
+  if(r){
+    memset((char*)r, 5, PGSIZE);
+  }
   return (void*)r;
 }
 

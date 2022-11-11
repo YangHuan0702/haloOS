@@ -7,7 +7,6 @@
 
 #define C(x)  ((x)-'@')  // Control-x
 #define INPUT_MAX 128
-#define BACKSPACE 0x100
 struct {
     struct spinlock slock;
     char buf[INPUT_MAX];
@@ -69,15 +68,7 @@ void consoleinit(){
     devsw[CONSOLE].write = consolewrite;
 }
 
-void consputc(int c){
-    if(c == BACKSPACE){
-        uartputc_sync('\b');
-        uartputc_sync(' ');
-        uartputc_sync('\b');
-    }else{
-        uartputc_sync(c);
-    }
-}
+
 
 void consoleintr(int c){
     acquire(&cons.slock);

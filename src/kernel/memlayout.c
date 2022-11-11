@@ -39,7 +39,7 @@ void uartputc(char c){
 }
 
 void uart_putc(char c){
-  uartputc_sync(c);
+  consputc(c);
 }
 
 void uart_putstr(char* s){
@@ -130,4 +130,14 @@ void uartinterrupt(){
     acquire(&uart_tx_lock);
     uartstart();
     release(&uart_tx_lock);
+}
+
+void consputc(int c){
+    if(c == BACKSPACE){
+        uartputc_sync('\b');
+        uartputc_sync(' ');
+        uartputc_sync('\b');
+    }else{
+        uartputc_sync(c);
+    }
 }
