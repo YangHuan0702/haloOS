@@ -3,7 +3,7 @@
 #include "file.h"
 #include "spinlock.h"
 #include "proc.h"
-
+#include "memlayout.h"
 
 #define C(x)  ((x)-'@')  // Control-x
 #define INPUT_MAX 128

@@ -10,6 +10,7 @@
 extern void kernelvec();
 
 struct spinlock slock;
+uint ticks;
 
 extern char trampoline[], uservec[], userret[];
 
@@ -39,7 +40,13 @@ void usertrapret(){
     ((void (*)(uint64,uint64))fn)(TRAPFRAME, satp);
 }
 
-static volatile int timer_processed_count = 0;
+void clockintr(){
+    acquire(&slock);
+    ticks++;
+    wakeup(&ticks);
+    release(&slock);
+}
+
 
 int devintr(){
      uint64 scause = r_scause();
@@ -57,8 +64,11 @@ int devintr(){
         }
         return 1;
      }else if(scause == 0x8000000000000001L){
-          w_sip(r_sip() & ~2);
-          return 2;
+        if(cpuid() == 0){
+            clockintr();
+        } 
+        w_sip(r_sip() & ~2);
+        return 2;
      }else{
         return 0;
     }
@@ -70,11 +80,11 @@ void kerneltrap(){
     uint64 sstatus = r_sstatus();
     uint64 sepc = r_sepc();
     if((sstatus & SSTATUS_SPP) == 0){
-        println("kerneltrap: interrupt from U Model");
+        printf("kerneltrap: interrupt from U Model\n");
         return;
     }
     if((r_sstatus() & SSTATUS_SIE) != 0){
-        println("kerneltrap: Handle kernel interrupts SIE cannot be set");
+        printf("kerneltrap: Handle kernel interrupts SIE cannot be set\n");
         return;
     }
     if((which_dev = devintr()) == 0){

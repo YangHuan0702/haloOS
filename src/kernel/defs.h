@@ -51,6 +51,7 @@ void wakeup(void*);
 void yield();
 pagetable_t proc_pagetable(struct proc*);
 int fork();
+void exit(int);
 
 
 // file.c
@@ -59,6 +60,7 @@ struct file* filealloc();
 struct file* filedup(struct file*);
 int filewrite(struct file*,uint64,int);
 int fileread(struct file*,uint64,int);
+void fileclose(struct file*);
 
 // memlayout.c
 void uart_putstr(char*);
@@ -108,9 +110,6 @@ struct inode* idup(struct inode*);
 
 // print.c
 void printf(char*, ...);
-void print(char*);
-void println(char*);
-void printP(uint64);
 void printinit();
 void panic(char*);
 

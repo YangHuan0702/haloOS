@@ -19,7 +19,7 @@ int main(){
         virtio_disk_init();
         userinit();
         __sync_synchronize();
-        print("OS: Start\n");
+        printf("OS: Start\n");
         started = 1;
     }else{
         while (started == 0) {

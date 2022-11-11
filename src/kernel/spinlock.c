@@ -53,7 +53,7 @@ void push_off() {
   mycpu()->noff += 1;
 }
 
-void pop_off(void) {
+void pop_off() {
   struct cpu *c = mycpu();
   if(intr_get())
     panic("pop_off - interruptible");

@@ -8,6 +8,7 @@ int fork();
 int exec(char*,char**);
 int wait(int*);
 int read(int,char*,int);
+int exit(int) __attribute__((noreturn));
 
 // printf.c
 // void fprintf(int,char*,...);

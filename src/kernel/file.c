@@ -34,6 +34,26 @@ struct file* filealloc(){
     return 0;
 }
 
+void fileclose(struct file *f){
+    acquire(&filecache.slock);
+    if(f->ref < 1){
+        panic("fileclose f ref < 1");
+    }
+    if(--f->ref > 0){
+        release(&filecache.slock);
+        return;
+    }
+    struct file ff = *f;
+    f->ref = 0;
+    f->type = FD_NONE;
+    release(&filecache.slock);
+
+    if(ff.type == FD_PIPE){
+
+    }else if(ff.type == FD_INODE || ff.type == FD_DEVICE){
+        iput(ff.ip);
+    }
+}
 
 int filewrite(struct file *f,uint64 p,int n){
     if(f->writable == 0){

@@ -42,3 +42,8 @@ read:
     li a7,SYS_READ
     ecall
     ret
+.global exit
+exit:
+    li a7,SYS_EXIT
+    ecall
+    ret

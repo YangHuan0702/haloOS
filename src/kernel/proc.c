@@ -145,6 +145,7 @@ int wait(uint64 addr){
                                   sizeof(np->xstate)) < 0) {
 						release(&np->slock);
 						release(&wait_lock);
+						panic("wait:copyoutpg -1");
 						return -1;
 					}
 					freeproc(np);
@@ -160,10 +161,10 @@ int wait(uint64 addr){
 			release(&wait_lock);	
 			return -1;
 		}
-
 		sleep(p,&wait_lock);
 	}
 }
+
 
 
 void sched(){
@@ -298,6 +299,44 @@ void userinit(){
 	release(&p->slock);	
 }
 
+void reparent(struct proc *p){
+	struct proc *pp;
+	for(pp = procs; pp < &procs[NPROC];pp++){
+		if(pp->parent == p){
+			pp->parent = initp;
+			wakeup(initp);
+		}
+	}
+}
+
+void exit(int n){
+	struct proc *p = myproc();
+	if(p == initp){
+		panic("init proc exit");
+	}
+	for(int fd = 0;fd < OPENFILE;fd++){
+		if(p->openfs[fd]){
+			fileclose(p->openfs[fd]);
+			p->openfs[fd] = 0;
+		}
+	}
+
+	iput(p->pwd);
+	p->pwd = 0;
+
+	acquire(&wait_lock);
+
+	reparent(p);
+	wakeup(p->parent);
+
+	acquire(&p->slock);
+	p->xstate = n;
+	p->state = ZOMBIE;
+	
+	release(&wait_lock);
+	sched();
+	panic("proc exit");
+}
 
 int fork(){
 	struct proc *now = myproc();

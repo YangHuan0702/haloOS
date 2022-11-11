@@ -42,31 +42,39 @@ static void printPtr(uint64 ptr){
 }
 
 
-void printP(uint64 ptr){
-    uart_putc('0');
-    uart_putc('x');
-    char buff[32];    
+// static void printP(uint64 ptr){
+//     uart_putc('0');
+//     uart_putc('x');
+//     char buff[32];    
     
-    int a,i;
-    i = 0;
-    do {
-        a = ptr % 16;
-        buff[i++] = nums[a];
-    } while ((ptr /= 16) > 0);
-    for(i-=1;i >= 0; i--){
-         uart_putc(buff[i]);
-    }
-}
+//     int a,i;
+//     i = 0;
+//     do {
+//         a = ptr % 16;
+//         buff[i++] = nums[a];
+//     } while ((ptr /= 16) > 0);
+//     for(i-=1;i >= 0; i--){
+//          uart_putc(buff[i]);
+//     }
+// }
 
-void print(char *s){
+static void print(char *s){
     uart_putstr(s);
 }
+
+
+// static void println(char *s){
+//     char *nextLine = "\n";
+//     uart_putstr(s);
+//     uart_putstr(nextLine);
+// }
 
 void printf(char *s, ...){
     if(s == 0){
         return;
     }
-    if(pr.locking){
+    int locking = pr.locking;
+    if(locking){
         acquire(&pr.slock);
     }
     va_list ap;
@@ -101,20 +109,14 @@ void printf(char *s, ...){
             break;
         }
     }    
-    if(pr.locking){
+    if(locking){
         release(&pr.slock);
     }
 }
 
 
-
-void println(char *s){
-    char *nextLine = "\n";
-    uart_putstr(s);
-    uart_putstr(nextLine);
-}
-
 void panic(char *str){
+
     pr.locking = 0;
     print("panic:");
     print(str);

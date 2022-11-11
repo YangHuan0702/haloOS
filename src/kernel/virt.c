@@ -46,11 +46,11 @@ static int alloc_desc() {
 static void free_desc(int i)
 {
   if(i >= NUM){
-    println("free_desc 1");
+    printf("free_desc 1");
     return;
   }
   if(disk.free[i]){
-    println("free_desc 2");
+    printf("free_desc 2");
     return;
   }
   disk.desc[i].addr = 0;
@@ -174,7 +174,7 @@ void virtio_disk_init() {
      *R(VIRTIO_MMIO_VERSION) != 1 ||              
      *R(VIRTIO_MMIO_DEVICE_ID) != 2 ||
      *R(VIRTIO_MMIO_VENDOR_ID) != 0x554d4551) {
-    println("could not find virtio disk");
+    printf("could not find virtio disk");
     return;
   }
   
@@ -212,11 +212,11 @@ void virtio_disk_init() {
   *R(VIRTIO_MMIO_QUEUE_SEL) = 0;
   uint32 max = *R(VIRTIO_MMIO_QUEUE_NUM_MAX);
   if(max == 0){
-    println("virtio disk has no queue 0");
+    printf("virtio disk has no queue 0");
     return;
   }
   if(max < NUM){
-    println("virtio disk max queue too short");
+    printf("virtio disk max queue too short");
     return;
   }
 
@@ -246,7 +246,7 @@ void virtio_disk_isr()
     __sync_synchronize();
     int id = disk.used->ring[disk.used_idx % NUM].id;
     if (disk.info[id].status != 0){
-      println("virtio_disk_intr status");
+      printf("virtio_disk_intr status");
     }
     struct buf *b = disk.info[id].b;
     if(b == 0){

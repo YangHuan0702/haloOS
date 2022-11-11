@@ -23,7 +23,7 @@ static void printInt(int val,int u){
     }
 }
 
-void print(char *s){
+static void print(char *s){
     while (*s) {
         putc(1,*(s++));
     }

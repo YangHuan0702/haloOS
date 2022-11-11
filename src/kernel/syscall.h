@@ -7,3 +7,4 @@
 #define SYS_EXEC2   7 
 #define SYS_FORK    8
 #define SYS_READ    9
+#define SYS_EXIT    10
