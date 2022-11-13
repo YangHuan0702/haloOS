@@ -10,6 +10,15 @@ QFLAGS = -nographic -smp 4 -m 128M -machine virt -bios none
 # virtio-blk-device,drive=x0,bus=virtio-mmio-bus.0
 CFLAGS += -mno-relax -I.
 
+
+ifneq ($(shell $(CC) -dumpspecs 2>/dev/null | grep -e '[^f]no-pie'),)
+CFLAGS += -fno-pie -no-pie
+endif
+ifneq ($(shell $(CC) -dumpspecs 2>/dev/null | grep -e '[^f]nopie'),)
+CFLAGS += -fno-pie -nopie
+endif
+
+
 OBJS = \
 		 src/kernel/entry.o \
 		 src/kernel/start.o \
@@ -40,12 +49,12 @@ OBJS = \
 
 -include src/kernel/*.d src/user/*.d
 
+.PRECIOUS: %.o
 USERS = \
 		src/user/_ls\
 		src/user/_init\
 		src/user/_sh\
 
-.PRECIOUS: %.o
 
 XCFLAGS += -DSOL_HALO -DLAB_HALO
 CFLAGS += $(XCFLAGS)
@@ -77,6 +86,7 @@ _%: %.o $(ULIB)
 	$(LD) $(LDFLAGS) -N -e main -Ttext 0 -o $@ $^
 	$(OBJDUMP) -S $@ > $*.asm
 	$(OBJDUMP) -t $@ | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$$/d' > $*.sym
+	
 
 all: os.elf
 

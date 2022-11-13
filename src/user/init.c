@@ -3,7 +3,9 @@
 #include "src/kernel/fcntl.h"
 #include "src/user/users.h"
 
+
 char *argv[] = { "sh", 0 };
+
 
 int main(){
     if(open("console",O_RDWR) < 0){
