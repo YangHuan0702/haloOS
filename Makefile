@@ -10,7 +10,6 @@ QFLAGS = -nographic -smp 4 -m 128M -machine virt -bios none
 # virtio-blk-device,drive=x0,bus=virtio-mmio-bus.0
 CFLAGS += -mno-relax -I.
 
-
 ifneq ($(shell $(CC) -dumpspecs 2>/dev/null | grep -e '[^f]no-pie'),)
 CFLAGS += -fno-pie -no-pie
 endif
@@ -82,12 +81,14 @@ LDFLAGS = -z max-page-size=4096
 
 ULIB = src/user/sysc.o src/user/printf.o src/user/str.o
 
+# src/user/%.o: src/user/%.c
+# 	$(CC) $(CFLAGS) -c -o $@ $<
+
 _%: %.o $(ULIB)
 	$(LD) $(LDFLAGS) -N -e main -Ttext 0 -o $@ $^
 	$(OBJDUMP) -S $@ > $*.asm
 	$(OBJDUMP) -t $@ | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$$/d' > $*.sym
 	
-
 all: os.elf
 
 CPUS = 1

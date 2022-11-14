@@ -8,12 +8,13 @@ char *argv[] = { "sh", 0 };
 
 
 int main(){
+    // 标准输入
     if(open("console",O_RDWR) < 0){
         mknod("console",1,0);
         open("console",O_RDWR);
     }
-    dup(0); // std out
-    dup(0); // std error
+    dup(0); // 标准输出
+    dup(0); // 异常输出
     int pid = 0,wpid;
     for(;;){
         printf("init: starting sh\n");
