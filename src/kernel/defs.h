@@ -6,6 +6,7 @@ struct sleeplock;
 struct file;
 struct cpu;
 struct proc;
+struct stat;
 
 // swtch.S
 void swtch(struct context*, struct context*);
@@ -53,6 +54,7 @@ pagetable_t proc_pagetable(struct proc*);
 int fork();
 void exit(int);
 void procdump();
+int growproc(int);
 
 
 // file.c
@@ -62,6 +64,7 @@ struct file* filedup(struct file*);
 int filewrite(struct file*,uint64,int);
 int fileread(struct file*,uint64,int);
 void fileclose(struct file*);
+uint64 filestat(struct file*,uint64);
 
 // memlayout.c
 void uart_putstr(char*);
@@ -109,6 +112,7 @@ void iunlock(struct inode*);
 void iput(struct inode*);
 void bwrite(struct buf*);
 struct inode* idup(struct inode*);
+void stati(struct inode*,struct stat*);
 
 // print.c
 void printf(char*, ...);

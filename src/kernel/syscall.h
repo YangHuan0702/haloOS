@@ -8,3 +8,6 @@
 #define SYS_FORK    8
 #define SYS_READ    9
 #define SYS_EXIT    10
+#define SYS_SBRK    11
+#define SYS_FSTAT   12
+#define SYS_CLOSE   13

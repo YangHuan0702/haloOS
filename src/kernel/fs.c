@@ -3,6 +3,7 @@
 #include "fs.h"
 #include "file.h"
 #include "riscv.h"
+#include "stat.h"
 
 #define NBUF 16
 #define INODES 32
@@ -440,4 +441,13 @@ int dirlink(struct inode *dp,char *path,short inum){
         panic("dirlink writei");
     };
     return 0;
+}
+
+
+void stati(struct inode *i,struct stat *s){
+    s->dev = i->dev;
+    s->ino = i->inum;
+    s->type = i->type;
+    s->nlink = i->nlink;
+    s->size = i->size;
 }

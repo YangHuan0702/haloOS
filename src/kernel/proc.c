@@ -123,6 +123,21 @@ int allocpid(){
 }
 
 
+int growproc(int n){
+	struct proc *p = myproc();
+	uint sz = p->sz;
+	if(n > 0){
+		if((sz ==  uvmalloc(p->pagetable,sz,sz+n)) == 0){
+			return -1;
+		}
+	}else if(n < 0){
+		sz = uvmalloc(p->pagetable,sz,sz+n);
+	}
+	p->sz = sz;
+	return 0;
+}
+
+
 static void freeproc(struct proc *p){
 	if(p->trapframe){
 		// kfree

@@ -2,6 +2,8 @@
 #include "defs.h"
 #include "file.h"
 #include "fs.h"
+#include "stat.h"
+#include "proc.h"
 
 #define NFILE 100
 
@@ -100,3 +102,17 @@ struct  file* filedup(struct file* f){
     return f;
 } 
 
+uint64 filestat(struct file *f,uint64 addr){
+    struct proc *p = myproc();
+    struct stat st;
+    if(f->type == FD_INODE || f->type == FD_DEVICE){
+    ilock(f->ip);
+    stati(f->ip, &st);
+    iunlock(f->ip);
+    if(copyoutpg(p->pagetable, addr, (char *)&st, sizeof(st)) < 0){
+      return -1;
+    }
+    return 0;
+  }
+  return -1;
+}

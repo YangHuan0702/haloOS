@@ -79,7 +79,7 @@ LD = riscv64-unknown-elf-ld
 
 LDFLAGS = -z max-page-size=4096
 
-ULIB = src/user/sysc.o src/user/printf.o src/user/str.o
+ULIB = src/user/sysc.o src/user/printf.o src/user/str.o src/user/umem.o
 
 # src/user/%.o: src/user/%.c
 # 	$(CC) $(CFLAGS) -c -o $@ $<

@@ -44,7 +44,7 @@ strncmp(const char *p, const char *q, uint n)
   return (uchar)*p - (uchar)*q;
 }
 
-int
+uint
 strlen(const char *s)
 {
   int n;

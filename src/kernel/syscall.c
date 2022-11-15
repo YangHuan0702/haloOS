@@ -14,6 +14,9 @@ extern uint64 sys_mknod(void);
 extern uint64 sys_fork(void);
 extern uint64 sys_read(void);
 extern uint64 sys_exit(void);
+extern uint64 sys_sbrk(void);
+extern uint64 sys_fstat(void);
+extern uint64 sys_close(void);
 
 static uint64 (*syscalls[])(void) = {
     [SYS_WRITE]     sys_write,
@@ -25,7 +28,10 @@ static uint64 (*syscalls[])(void) = {
     [SYS_MKNOD]     sys_mknod,
     [SYS_FORK]      sys_fork,
     [SYS_READ]      sys_read,
-    [SYS_EXIT]      sys_exit
+    [SYS_EXIT]      sys_exit,
+    [SYS_SBRK]      sys_sbrk,
+    [SYS_FSTAT]     sys_fstat,
+    [SYS_CLOSE]     sys_close,
 };
 
 void syscall(){

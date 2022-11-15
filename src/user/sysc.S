@@ -47,3 +47,18 @@ exit:
     li a7,SYS_EXIT
     ecall
     ret
+.global sbrk
+sbrk:
+    li a7,SYS_SBRK
+    ecall
+    ret
+.global fstat
+fstat:
+    li a7,SYS_FSTAT
+    ecall
+    ret    
+.global close
+close:
+    li a7,SYS_CLOSE
+    ecall
+    ret

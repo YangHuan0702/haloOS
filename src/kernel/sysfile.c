@@ -120,6 +120,25 @@ sys_exec() {
 }
 
 
+uint64 sys_fstat(){
+    struct file *f;
+    uint64 st;
+    if(argfd(0,0,&f) < 0 || argaddr(1,&st) < 0){
+        return -1;
+    }
+    return filestat(f,st);
+}
+
+uint64 sys_close(){
+    int fd;
+    struct file *f;
+    if(argfd(0,&fd,&f) < 0){
+        return -1;
+    }
+    myproc()->openfs[fd] = 0;
+    fileclose(f);
+    return 0;
+}
 
 uint64 sys_dup(){
     struct file *f;
