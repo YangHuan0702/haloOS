@@ -3,7 +3,7 @@
 #include "src/kernel/stat.h"
 #include "src/user/users.h"
 
-void *memset(void *dest, int c, int sz) {
+void* memset(void *dest, int c, uint sz) {
   char *cdest = (char *)dest;
   for (int i = 0; i < sz; i++) {
     cdest[i] = c;
@@ -39,12 +39,22 @@ void *memmove(void *vdst,const void *vsrc, int n) {
 }
 
 int atoi(const char *s) {
-  int n;
+  int n = 0;
 
-  n = 0;
-  while ('0' <= *s && *s <= '9') n = n * 10 + *s++ - '0';
+  while ('0' <= *s && *s <= '9'){
+      n = n * 10 + *s++ - '0';
+  } 
   return n;
 }
+
+int
+strcmp(const char *p, const char *q)
+{
+  while(*p && *p == *q)
+    p++, q++;
+  return (uchar)*p - (uchar)*q;
+}
+
 
 int memcmp(const void *s1, const void *s2, uint n) {
   const char *p1 = s1, *p2 = s2;
@@ -61,8 +71,6 @@ int memcmp(const void *s1, const void *s2, uint n) {
 void *memcpy(void *dst, const void *src, uint n) { 
     return memmove(dst, src, n); 
 }
-
-
 
 char*
 gets(char *buf, int max)

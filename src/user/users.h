@@ -1,5 +1,5 @@
 struct stat;
-
+struct rtcdate;
 
 
 // system call
@@ -20,23 +20,19 @@ int close(int);
 // void fprintf(int,char*,...);
 // void println(char*);
 // void printf(char*,...);
-void fprintf(int, const char*, ...);
+// void fprintf(int, const char*, ...);
 void printf(const char*, ...);
 
-
-// str.c
-void* memset(void*,int,int);
-uint strlen(const char*);
-void* memmove(void*,const void*,int);
-int atoi(const char*);
-int memcmp(const void *, const void *, uint);
-void *memcpy(void *, const void *, uint);
-char* gets(char*, int);
-int stat(const char *, struct stat*);
-char* strchr(const char*, char c);
-char* strcpy(char*, const char*);
-
-
-// umem.c
-void free(void*);
-void* malloc(uint);
+// int stat(const char*, struct stat*);
+// char* strcpy(char*, const char*);
+// void *memmove(void*, const void*, int);
+// char* strchr(const char*, char c);
+// int strcmp(const char*, const char*);
+// char* gets(char*, int max);
+// uint strlen(const char*);
+// void* memset(void*, int, uint);
+// void* malloc(uint);
+// void free(void*);
+// int atoi(const char*);
+// int memcmp(const void *, const void *, uint);
+// void *memcpy(void *, const void *, uint);

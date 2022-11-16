@@ -5,6 +5,57 @@
 #include "file.h"
 #include "proc.h"
 
+static uint64 argraw(int n) {
+  struct proc *p = myproc();
+  switch (n) {
+  case 0:
+    return p->trapframe->a0;
+  case 1:
+    return p->trapframe->a1;
+  case 2:
+    return p->trapframe->a2;
+  case 3:
+    return p->trapframe->a3;
+  case 4:
+    return p->trapframe->a4;
+  case 5:
+    return p->trapframe->a5;
+  }
+  panic("argraw");
+  return -1;
+}
+
+int fetchstr(uint64 addr, char *buf, int max) {
+  struct proc *p = myproc();
+  int err = copyinstr(p->pagetable, buf, addr, max);
+  if(err < 0){
+    panic("fetchstr err < 0");
+    return err;
+  }
+  return strlen(buf);
+}
+
+int argstr(int num,char *buf,int size){
+    uint64 addr;
+    if(argaddr(num,&addr) < 0){
+        return -1;
+    }
+    return fetchstr(addr,buf,size);
+}
+
+int argint(int n,int *ip){
+    *ip = argraw(n);
+    return 0;
+}
+
+int
+argaddr(int n, uint64 *ip)
+{
+  *ip = argraw(n);
+  return 0;
+}
+
+
 extern uint64 sys_write(void);
 extern uint64 sys_exec(void);
 extern uint64 sys_dup(void);

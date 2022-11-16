@@ -42,7 +42,6 @@ OBJS = \
 		 src/kernel/syscall.o \
 		 src/kernel/sysfile.o \
 		 src/kernel/sysproc.o \
-		 src/kernel/argsutil.o \
 		 src/kernel/trampoline.o \
 		 src/kernel/vm.o \
 
@@ -79,8 +78,8 @@ LD = riscv64-unknown-elf-ld
 
 LDFLAGS = -z max-page-size=4096
 
-ULIB = src/user/sysc.o src/user/printf.o src/user/str.o src/user/umem.o
-
+ULIB = src/user/sysc.o src/user/printf.o
+# src/user/umem.o src/user/ulib.o
 # src/user/%.o: src/user/%.c
 # 	$(CC) $(CFLAGS) -c -o $@ $<
 
@@ -93,7 +92,7 @@ all: os.elf
 
 CPUS = 1
 
-QEMUOPTS = -machine virt -bios none -kernel src/kernel/kernel -m 128M -smp $(CPUS) -nographic
+QEMUOPTS = -machine virt -bios none -kernel src/kernel/kernel -m 128M -smp 1 -nographic
 QEMUOPTS += -drive file=fs.img,if=none,format=raw,id=x0
 QEMUOPTS += -device virtio-blk-device,drive=x0,bus=virtio-mmio-bus.0
 

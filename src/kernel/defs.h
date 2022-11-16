@@ -7,6 +7,7 @@ struct file;
 struct cpu;
 struct proc;
 struct stat;
+#include "vm.h"
 
 // swtch.S
 void swtch(struct context*, struct context*);
@@ -21,6 +22,10 @@ int holdinglock(struct spinlock*);
 
 // syscall.c
 void syscall();
+int argaddr(int,uint64*);
+int argstr(int,char*,int);
+int argint(int,int*);
+int fetchstr(uint64, char*, int);
 
 // sleeplock.c
 void sleep_lock(struct sleeplock*);
@@ -30,12 +35,6 @@ int holdingsleep(struct sleeplock*);
 
 // exec.c
 int exec(char*,char**);
-
-// argsuitl.c
-int argaddr(int,uint64*);
-int argstr(int,char*,int);
-int argint(int,int*);
-int fetchstr(uint64, char*, int);
 
 // proc.c
 struct cpu* mycpu();

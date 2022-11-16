@@ -9,10 +9,10 @@
 #define PX(level, va) ((((uint64) (va)) >> PXSHIFT(level)) & PXMASK)
 #define PTE_FLAGS(pte) ((pte) & 0x3FF)
 
+#define MAXVA (1L << (9 + 9 + 9 + 12 - 1))
 #define TRAMPOLINE (MAXVA - PGSIZE)
 #define KSTACK(p) (TRAMPOLINE - ((p)+1)* 2*PGSIZE)
 
-#define MAXVA (1L << (9 + 9 + 9 + 12 - 1))
 
 typedef uint64 pte_t;
 typedef uint64 *pagetable_t;

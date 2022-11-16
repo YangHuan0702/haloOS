@@ -70,7 +70,7 @@ int filewrite(struct file *f,uint64 p,int n){
         }
         ret = devsw[f->major].write(1, p, n);
     }else if(f->type == FD_INODE){
-
+       
     }else{
         panic("filewrite");
     }

@@ -20,7 +20,8 @@
         "fcntl.h": "c",
         "param.h": "c",
         "limits": "c",
-        "typeinfo": "c"
+        "typeinfo": "c",
+        "vm.h": "c"
     },
     "C_Cpp.errorSquiggles": "Disabled"
 }

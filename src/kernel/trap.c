@@ -114,6 +114,9 @@ void usertrap(){
     struct proc *p = myproc();
     p->trapframe->epc = r_sepc();
     if(r_scause() == 8){
+        if(p->killed){
+            exit(-1);
+        }
         p->trapframe->epc += 4;
         intr_on();
         syscall();

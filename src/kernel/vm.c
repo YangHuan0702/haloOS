@@ -241,7 +241,6 @@ uint64 walkaddr(pagetable_t pagetable, uint64 va) {
   uint64 pa;
 
   if(va >= MAXVA){
-    panic("va >= MAXVA \n");
     return 0;
   }
   
@@ -390,8 +389,6 @@ int copyinstr(pagetable_t pagetable, char *dst, uint64 srcva, uint64 max) {
     va0 = PGROUNDDOWN(srcva);
     pa0 = walkaddr(pagetable, va0);
     if(pa0 == 0){
-      printf("copyinstr pa0 == 0,proc:%s,pid:%d\n",myproc()->name,myproc()->pid);
-      panic("---------------------------");
       return -1;
     }
     n = PGSIZE - (srcva - va0);

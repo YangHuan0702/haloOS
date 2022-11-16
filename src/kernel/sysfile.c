@@ -28,7 +28,6 @@ static int argfd(int n,int *pfd,struct file **fe){
         return -1;
     }
     if(fd < 0 || fd >= OPENFILE || (f = myproc()->openfs[fd]) == 0){
-        printf("n:%d,fd:%d,proc:%s\n",n,fd,myproc()->name);
         return -1;
     }
     if(pfd){
@@ -64,60 +63,60 @@ uint64 sys_read(){
     return fileread(f,p,sz);
 }
 
-// uint64 sys_exec(){
-//     char name[MAXPATH];
-//     if(argstr(0,name,MAXPATH) < 0) {
-//         return -1;
-//     };
-//     printf("exec: %s,p.name:%s,p.id:%d\n",name,myproc()->name,myproc()->pid);
-//     int ret = exec(name,0);
-//     return ret;
-// }
-
-uint64
-sys_exec() {
-  char path[MAXPATH], *argv[MAXARG];
-  int i;
-  uint64 uargv, uarg;
-
-  if(argstr(0, path, MAXPATH) < 0 || argaddr(1, &uargv) < 0){
-    return -1;
-  }
-  memset(argv, 0, sizeof(argv));
-  for(i=0;; i++){
-    if(i >= NELEM(argv)){
-      goto bad;
-    }
-    if(fetchaddr(uargv+sizeof(uint64)*i, (uint64*)&uarg) < 0){
-        printf("fetchaddr r < 0");
-        goto bad;
-    }
-    if(uarg == 0){
-      argv[i] = 0;
-      break;
-    }
-    argv[i] = kalloc();
-    if(argv[i] == 0){
-      goto bad;
-    }
-    if(fetchstr(uarg, argv[i], PGSIZE) < 0){
-        panic("exec:fetchstr");
-        goto bad;
-    }
-  }
-  printf("exec: %s,p.name:%s,p.id:%d\n",path,myproc()->name,myproc()->pid);
-  int ret = exec(path, argv);
-
-  for(i = 0; i < NELEM(argv) && argv[i] != 0; i++)
-    kfree(argv[i]);
-
-  return ret;
-
- bad:
-  for(i = 0; i < NELEM(argv) && argv[i] != 0; i++)
-    kfree(argv[i]);
-  return -1;
+uint64 sys_exec(){
+    char name[MAXPATH];
+    if(argstr(0,name,MAXPATH) < 0) {
+        return -1;
+    };
+    printf("exec: %s,p.name:%s,p.id:%d\n",name,myproc()->name,myproc()->pid);
+    int ret = exec(name,0);
+    return ret;
 }
+
+// uint64
+// sys_exec() {
+//   char path[MAXPATH], *argv[MAXARG];
+//   int i;
+//   uint64 uargv, uarg;
+//   if(argstr(0, path, MAXPATH) < 0 || argaddr(1, &uargv) < 0){
+//     return -1;
+//   }
+//   printf("path:%s\n",path);
+//   memset(argv, 0, sizeof(argv));
+//   for(i=0;; i++){
+//     if(i >= NELEM(argv)){
+//       goto bad;
+//     }
+//     if(fetchaddr(uargv+sizeof(uint64)*i, (uint64*)&uarg) < 0){
+//         printf("fetchaddr r < 0");
+//         goto bad;
+//     }
+//     if(uarg == 0){
+//       argv[i] = 0;
+//       break;
+//     }
+//     argv[i] = kalloc();
+//     if(argv[i] == 0){
+//       goto bad;
+//     }
+//     if(fetchstr(uarg, argv[i], PGSIZE) < 0){
+//         panic("exec:fetchstr");
+//         goto bad;
+//     }
+//   }
+//   printf("exec: %s,p.name:%s,p.id:%d\n",path,myproc()->name,myproc()->pid);
+//   int ret = exec(path, argv);
+
+//   for(i = 0; i < NELEM(argv) && argv[i] != 0; i++)
+//     kfree(argv[i]);
+
+//   return ret;
+
+//  bad:
+//   for(i = 0; i < NELEM(argv) && argv[i] != 0; i++)
+//     kfree(argv[i]);
+//   return -1;
+// }
 
 
 uint64 sys_fstat(){
@@ -143,7 +142,6 @@ uint64 sys_close(){
 uint64 sys_dup(){
     struct file *f;
     int fd;
-
     if(argfd(0,0,&f) < 0){
         return -1;
     }
@@ -190,6 +188,7 @@ static struct inode* create(char *path,short type,short major,short minor){
 }
 
 uint64 sys_mknod(){
+    printf("join mknod\n");
     struct inode *ip;
     char path[MAXPATH];
     int major, minor;
@@ -219,7 +218,6 @@ uint64 sys_open(){
     if((n = argstr(0,path,MAXPATH)) < 0 || argint(1,&model) < 0){
         return -1;
     }
-    
     struct inode *ip;
 
     if(model & O_CREATE){
@@ -238,6 +236,7 @@ uint64 sys_open(){
     ilock(ip);
 
     if(ip->type == T_DEVICE && (ip->major < 0 || ip->major >= NDEV)){
+        panic("open: ip type error\n");
         return -1;
     }
 

@@ -70,9 +70,6 @@ static void print(char *s){
 // }
 
 void printf(char *s, ...){
-    if(s == 0){
-        return;
-    }
     int locking = pr.locking;
     if(locking){
         acquire(&pr.slock);
