@@ -40,6 +40,9 @@
 
 int main(){
     printf("$ ");
+    for(;;){
+
+    }
     // static char buf[100];
     // int fd;
     // while ((fd = open("console",O_RDWR)) >= 0) {

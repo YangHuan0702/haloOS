@@ -188,7 +188,6 @@ static struct inode* create(char *path,short type,short major,short minor){
 }
 
 uint64 sys_mknod(){
-    printf("join mknod\n");
     struct inode *ip;
     char path[MAXPATH];
     int major, minor;
