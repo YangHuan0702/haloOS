@@ -10,7 +10,7 @@ int mknod(char*,int,int);
 int fork();
 int exec(char*,char**);
 int wait(int*);
-int read(int,char*,int);
+int read(int,void*,int);
 int exit(int) __attribute__((noreturn));
 char* sbrk(int);
 int fstat(int, struct stat*);

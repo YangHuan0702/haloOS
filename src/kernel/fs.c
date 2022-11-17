@@ -221,6 +221,9 @@ struct inode* rootsub(char *name){
 struct inode* iname(char *name){
     struct inode *i;
     struct inode *dp = iget(ROOTDEV,ROOTINO);
+    if(*name == '/'){
+        return dp;
+    }
     ilock(dp);
     i = inodeByName(dp,name);
     sleep_unlock(&dp->splock);

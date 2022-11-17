@@ -82,11 +82,17 @@ int fileread(struct file *f,uint64 p,int n){
         return -1;
     }
     int ret = 0;
-    if(f->type == T_DEVICE){
+    if(f->type == FD_DEVICE){
         if(f->major < 0 || f->major >= NDEV || !devsw[f->major].read){
             return -1;
         }
         ret = devsw[f->major].read(1,p,n);
+    }else if(f->type == FD_INODE){
+        ilock(f->ip);
+        if((ret = readi(f->ip,1,p,f->off,n)) > 0){
+            f->off += n;
+        }
+        iunlock(f->ip);
     }
     return ret;
 }
@@ -106,13 +112,13 @@ uint64 filestat(struct file *f,uint64 addr){
     struct proc *p = myproc();
     struct stat st;
     if(f->type == FD_INODE || f->type == FD_DEVICE){
-    ilock(f->ip);
-    stati(f->ip, &st);
-    iunlock(f->ip);
-    if(copyoutpg(p->pagetable, addr, (char *)&st, sizeof(st)) < 0){
-      return -1;
-    }
-    return 0;
+        ilock(f->ip);
+        stati(f->ip, &st);
+        iunlock(f->ip);
+        if(copyoutpg(p->pagetable, addr, (char *)&st, sizeof(st)) < 0){
+        return -1;
+        }
+        return 0;
   }
   return -1;
 }
