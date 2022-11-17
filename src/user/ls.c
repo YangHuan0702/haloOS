@@ -6,5 +6,8 @@
 
 int main(int argc,char *args[]){
     printf("Hello ls\n");
+    for(;;){
+
+    }
     return 0;
 }
